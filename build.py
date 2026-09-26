@@ -52,9 +52,24 @@ def cart_drawer(on_shop=False):
   <header>{T("O seu carrinho", "Your cart", "h3")}<button type="button" data-cart-close aria-label="Fechar / Close">×</button></header>
   <div class="items"></div>
   <footer><div class="total">{T("Total", "Total")}<b>0,00 €</b></div><small class="muted">{T("Portes calculados na confirmação.", "Shipping calculated on confirmation.")}</small>
-  <button class="btn btn-solid checkout" type="button" disabled>{ICON["wa"]}{T("Encomendar por WhatsApp", "Order via WhatsApp")}</button>
+  <button class="btn btn-solid checkout" type="button" aria-controls="checkout-form" aria-expanded="false" disabled>{T("Finalizar pedido", "Checkout")}</button>
   <p class="cart-terms">{T('O envio da mensagem é um pedido, não uma compra concluída. Consulte os <a href="termos.html">termos</a> e as <a href="envios-devolucoes.html">condições de envio e devolução</a>.', 'Sending the message is a request, not a completed purchase. Read the <a href="termos.html">terms</a> and <a href="envios-devolucoes.html">shipping and returns policy</a>.')}</p>
   {more}</footer>
+  <form id="checkout-form" class="checkout-form" hidden aria-labelledby="checkout-title">
+    <button class="btn btn-line btn-sm" type="button" data-checkout-back>{T("Voltar ao carrinho", "Back to cart")}</button>
+    {T("Dados do pedido", "Order details", "h3", attrs='id="checkout-title"')}
+    {T("Preencha os campos obrigatórios (*) antes de continuar para o WhatsApp. O pedido só é enviado quando confirmar a mensagem no WhatsApp.", "Fill in the required fields (*) before continuing to WhatsApp. Your request is only sent when you send the message in WhatsApp.", "p", "form-note")}
+    <div class="field"><label for="checkout-name">{T("Nome completo *", "Full name *")}</label><input id="checkout-name" name="name" autocomplete="name" maxlength="120" pattern=".*\\S.*" required></div>
+    <div class="field"><label for="checkout-email">{T("Email *", "Email *")}</label><input id="checkout-email" name="email" type="email" autocomplete="email" maxlength="160" required></div>
+    <div class="field"><label for="checkout-phone">{T("Telefone *", "Phone *")}</label><input id="checkout-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" pattern=".*\\S.*" required></div>
+    <div class="field"><label for="checkout-delivery">{T("Entrega *", "Delivery *")}</label><select id="checkout-delivery" name="delivery" required>{T("Envio para a morada", "Ship to my address", "option", attrs='value="shipping"')}{T("Levantamento no ateliê", "Studio collection", "option", attrs='value="pickup"')}</select></div>
+    <div class="field" data-checkout-address><label for="checkout-address">{T("Morada completa (incluindo código postal e país) *", "Full address (including postal code and country) *")}</label><textarea id="checkout-address" name="address" autocomplete="street-address" rows="3" maxlength="500" required></textarea></div>
+    <div class="field"><label for="checkout-notes">{T("Observações (opcional)", "Order notes (optional)")}</label><textarea id="checkout-notes" name="notes" rows="3" maxlength="1000"></textarea></div>
+    <label class="check"><input type="checkbox" name="privacy" required><span>{T('Li como os meus dados são utilizados para responder a este pedido (<a class="link" href="privacidade.html">privacidade</a>).', 'I have read how my details are used to reply to this request (<a class="link" href="privacidade.html">privacy</a>).')}</span></label>
+    <p class="form-note">{T("Os seus dados não são guardados no armazenamento do site. A disponibilidade, os portes e o pagamento serão confirmados pela Claudia. Este formulário não conclui uma compra.", "Your details are not saved in site storage. Claudia will confirm availability, shipping and payment. This form does not complete a purchase.")}</p>
+    <button class="btn btn-solid" type="submit">{ICON["wa"]}{T("Continuar para o WhatsApp", "Continue to WhatsApp")}</button>
+    <p class="form-note" data-checkout-status role="status" hidden>{T("Confirme o envio no WhatsApp. Se não abriu,", "Send your request in WhatsApp. If it did not open,")} <a class="link" data-checkout-link target="_blank" rel="noopener">{T("abra a mensagem aqui", "open the message here")}</a>.</p>
+  </form>
 </aside>
 '''
 

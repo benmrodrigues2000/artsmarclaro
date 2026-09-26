@@ -61,7 +61,29 @@ test('catalogue, cart persistence, quote hand-off and storage deletion', async (
   await expect(page.locator('#cart a[href="termos.html"]')).toBeVisible();
   await page.evaluate(() => { window.open = url => { window.testOutgoing = url; }; });
   await page.locator('.checkout').click();
-  expect(await page.evaluate(() => decodeURIComponent(window.testOutgoing))).toContain('2 × Difusor');
+  const checkout = page.locator('#checkout-form');
+  await expect(checkout).toBeVisible();
+  await expect(checkout.locator('[name="name"]')).toBeFocused();
+  expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
+  await checkout.locator('[type="submit"]').click();
+  expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
+  await checkout.locator('[name="name"]').fill('Ana Sousa');
+  await checkout.locator('[name="email"]').fill('ana@example.com');
+  await checkout.locator('[name="phone"]').fill('+351 919 123 456');
+  await checkout.locator('[name="privacy"]').check();
+  await checkout.locator('[type="submit"]').click();
+  expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
+  await expect(checkout.locator('[name="address"]')).toBeFocused();
+  await checkout.locator('[name="address"]').fill('Rua das Flores 12, 4400-001 Gaia, Portugal');
+  await checkout.locator('[name="notes"]').fill('Embrulho para presente & cartão');
+  await checkout.locator('[type="submit"]').click();
+  const outgoing = await page.evaluate(() => new URL(window.testOutgoing).searchParams.get('text'));
+  for (const detail of ['2 × Difusor', '76,00', 'Ana Sousa', 'ana@example.com', '+351 919 123 456', 'Rua das Flores 12', 'Embrulho para presente & cartão']) {
+    expect(outgoing).toContain(detail);
+  }
+  await expect(checkout.locator('[data-checkout-status]')).toBeVisible();
+  await expect(checkout.locator('[data-checkout-link]')).toHaveAttribute('href', await page.evaluate(() => window.testOutgoing));
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain('ana@example.com');
   await page.keyboard.press('Escape');
   await page.goto('/sobre.html');
   await page.locator('.cart-btn:visible').click();
@@ -138,4 +160,54 @@ test('internal links and fragment targets exist', async ({ page }) => {
       if (hash) expect(html[target], `${file}: missing fragment ${href}`).toContain(`id="${hash}"`);
     }
   }
+});
+
+
+test('checkout supports collection, back navigation and keyboard focus on other pages', async ({ page }) => {
+  await page.goto('/loja.html');
+  await page.locator('.add').first().click();
+  await page.keyboard.press('Escape');
+  await page.goto('/sobre.html');
+  await page.locator('[data-lang="en"]').click();
+  await page.locator('.cart-btn:visible').click();
+  await page.locator('.checkout').click();
+  const form = page.locator('#checkout-form');
+  await expect(form.locator('h3')).toHaveText('Order details');
+  await form.locator('[name="name"]').fill('Jane Smith');
+  await form.locator('[data-checkout-back]').click();
+  await expect(form).toBeHidden();
+  await expect(page.locator('.checkout')).toBeFocused();
+  await page.locator('.checkout').click();
+  await expect(form.locator('[name="name"]')).toHaveValue('Jane Smith');
+  await form.locator('[name="delivery"]').selectOption('pickup');
+  await expect(form.locator('[name="address"]')).toBeHidden();
+  await form.locator('[name="email"]').fill('invalid');
+  await form.locator('[name="phone"]').fill('020 1234 5678');
+  await form.locator('[name="privacy"]').check();
+  await page.evaluate(() => { window.open = url => { window.testOutgoing = url; }; });
+  await form.locator('[type="submit"]').click();
+  expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
+  await form.locator('[name="email"]').fill('jane@example.com');
+  await form.locator('[name="privacy"]').uncheck();
+  await form.locator('[type="submit"]').click();
+  expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
+  await form.locator('[name="privacy"]').check();
+  await form.locator('[type="submit"]').click();
+  const message = await page.evaluate(() => new URL(window.testOutgoing).searchParams.get('text'));
+  expect(message).toContain('Delivery: Studio collection');
+  expect(message).toContain('Jane Smith');
+  expect(message).not.toContain('Address:');
+  await form.locator('[data-checkout-link]').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#cart header button')).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(form.locator('[data-checkout-link]')).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.cart-btn:visible')).toBeFocused();
+  await page.locator('.cart-btn:visible').click();
+  await page.locator('[data-rm]').click();
+  await expect(page.locator('.checkout')).toBeDisabled();
+  await expect(form).toBeHidden();
+  await expect(form.locator('[name="name"]')).toHaveValue('');
 });

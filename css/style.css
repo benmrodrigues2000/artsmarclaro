@@ -650,3 +650,12 @@ h1 em,h2 em{color:inherit}
  .prose{padding:0}.legal-nav{gap:12px 18px}
  .drawer footer{padding:14px 20px}.drawer .checkout{white-space:normal}
 }
+
+/* Checkout is a second, scrollable step inside the existing cart dialog. */
+.drawer [hidden]{display:none!important}
+.checkout-form{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:22px 24px;display:grid;gap:18px}
+.checkout-form .field textarea{min-height:90px}
+.checkout-form .field input,.checkout-form .field select,.checkout-form .field textarea{font-size:16px}
+.checkout-form .btn{justify-content:center;white-space:normal}
+.checkout-form .check input{flex-shrink:0}
+.drawer > header{flex-shrink:0}
