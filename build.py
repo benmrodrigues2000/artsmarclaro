@@ -30,6 +30,33 @@ def WA(pt_label, en_label, msg_pt, msg_en, cls="btn btn-solid", icon=True):
             f'{ic}{T(pt_label, en_label)}</a>')
 
 
+def CART_BTN(cls=""):
+    """Header cart icon. It is a button (not a link): js/main.js opens the drawer
+    that every page carries, so the cart works from any page."""
+    c = f" {cls}" if cls else ""
+    return (f'<button class="cart-btn{c}" type="button" aria-controls="cart" aria-expanded="false" '
+            f'aria-label="Carrinho / Cart">{ICON["cart"]}<span class="cart-count"></span></button>')
+
+
+def cart_drawer(on_shop=False):
+    """Slide-in cart panel. Printed on every page (by foot()), so clicking the cart
+    icon opens it wherever the visitor is. `on_shop` swaps the "go to the shop" link
+    for a "keep shopping" button, since the products are already on screen."""
+    more = (f'<button class="btn btn-line btn-sm" type="button" data-cart-close>{T("Continuar a comprar", "Keep shopping")}</button>'
+            if on_shop else
+            f'<a class="btn btn-line btn-sm" href="loja.html">{T("Ver a loja", "Browse the shop")}</a>')
+    return f'''
+<div class="veil" data-cart-close></div>
+<aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Carrinho / Cart" aria-hidden="true" inert>
+  <header>{T("O seu carrinho", "Your cart", "h3")}<button type="button" data-cart-close aria-label="Fechar / Close">×</button></header>
+  <div class="items"></div>
+  <footer><div class="total">{T("Total", "Total")}<b>0,00 €</b></div><small class="muted">{T("Portes calculados na confirmação.", "Shipping calculated on confirmation.")}</small>
+  <button class="btn btn-solid checkout" type="button" disabled>{ICON["wa"]}{T("Encomendar por WhatsApp", "Order via WhatsApp")}</button>
+  {more}</footer>
+</aside>
+'''
+
+
 ICON = {
     "wa": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 12 2.2a9.8 9.8 0 0 1 0 19.6M12 0a12 12 0 0 0-10.3 18L0 24l6.2-1.6A12 12 0 1 0 12 0"/></svg>',
     "ig": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
@@ -95,7 +122,7 @@ def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
     <p class="util-tag">{T("Feito à mão em Vila Nova de Gaia", "Handmade in Vila Nova de Gaia")}</p>
     <div class="util-r">
       <div class="lang" role="group" aria-label="Idioma / Language"><button data-lang="pt" aria-pressed="true">PT</button><button data-lang="en" aria-pressed="false">EN</button></div>
-      <a class="cart-btn" href="loja.html" aria-label="Carrinho / Cart">{ICON["cart"]}<span class="cart-count"></span></a>
+      {CART_BTN()}
       {WA("Pedir orçamento", "Request a quote", *MSG_QUOTE, cls="util-quote", icon=False)}
     </div>
   </div></div>
@@ -106,14 +133,14 @@ def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
       <div class="nav-l">{"".join(navlink(h, pt, en) for h, pt, en in NAV[:3])}</div>
       <div class="nav-r">{"".join(navlink(h, pt, en) for h, pt, en in NAV[3:])}</div>
     </nav>
-    <a class="cart-btn cart-m" href="loja.html" aria-label="Carrinho / Cart">{ICON["cart"]}<span class="cart-count"></span></a>
+    {CART_BTN("cart-m")}
   </div>
 </header>
 <main id="main">
 '''
 
 
-def foot():
+def foot(on_shop=False):
     return f'''</main>
 <footer class="foot">
   <div class="wrap">
@@ -159,6 +186,7 @@ def foot():
   <p>{T("Usamos apenas cookies essenciais e, com a sua autorização, estatísticas anónimas para melhorar o site.", "We only use essential cookies and, with your permission, anonymous statistics to improve the site.")} <a class="link" href="privacidade.html">{T("Saber mais", "Learn more")}</a></p>
   <div class="cta-row"><button class="btn btn-solid btn-sm" data-c="yes">{T("Aceitar", "Accept")}</button><button class="btn btn-line btn-sm" data-c="no">{T("Recusar", "Decline")}</button></div>
 </div>
+{cart_drawer(on_shop)}
 <script src="js/main.js" defer></script>
 </body>
 </html>
@@ -239,7 +267,7 @@ def home():
   <div class="facts-bar">
     <div><b>100%</b>{T("feito à mão", "handmade")}</div>
     <div><b>1/1</b>{T("não há duas iguais", "no two alike")}</div>
-    <div><b>24h</b>{T("envio após pagamento", "dispatch after payment")}</div>
+    <div><b>MB WAY</b>{T("pagamento simples", "easy payment")}</div>
   </div>
 </div></section>
 
@@ -285,7 +313,7 @@ def home():
     <div class="quad">
       <div>{ICON["hand"]}<div>{T("Feito à mão", "Handmade", "h3")}{T("Todas as peças são 100% feitas à mão, por isso cada uma é única.", "Every piece is 100% handmade, so each one is unique.", "p")}</div></div>
       <div>{ICON["box"]}<div>{T("Embalagem cuidada", "Careful packaging", "h3")}{T("Embalagens personalizadas para que cada peça chegue intacta.", "Custom packaging so every piece arrives intact.", "p")}</div></div>
-      <div>{ICON["star"]}<div>{T("Envio em 24h", "Ships in 24h", "h3")}{T("Peças prontas são enviadas até 24 horas após o pagamento.", "Ready-made pieces ship within 24 hours of payment.", "p")}</div></div>
+      <div>{ICON["star"]}<div>{T("Envio combinado", "Shipping, agreed with you", "h3")}{T("Peças prontas a enviar saem no dia que combinarmos, assim que o pagamento é confirmado.", "Ready-made pieces go out on the day we agree, once payment is confirmed.", "p")}</div></div>
       <div>{ICON["heart"]}<div>{T("Envio internacional", "International shipping", "h3")}{T("Enviamos para fora de Portugal, com portes sob orçamento.", "We ship outside Portugal, with shipping quoted on request.", "p")}</div></div>
     </div>
   </div>
@@ -536,24 +564,17 @@ def shop():
   <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
 </article>''' for i, s, pt, en, p, dpt, den in PRODUCTS)
     return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
-                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp, envio em 24 horas.",
-                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, dispatched within 24 hours.", "difusor.jpg") + \
+                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
+                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "difusor.jpg") + \
         page_hero("Loja", "Shop", "Peças prontas, <em>à sua espera.</em>", "Ready-made pieces, <em>waiting for you.</em>",
                   "Peças únicas feitas à mão e prontas a enviar. Quando se esgotam, não voltam iguais.",
                   "One-of-a-kind handmade pieces, ready to ship. Once they’re gone, they won’t come back the same.") + f'''
 <section style="padding-top:10px"><div class="wrap">
-  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e o envio. Envio em até 24h após pagamento. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability, payment (MB WAY or bank transfer) and shipping. Dispatched within 24h of payment. International shipping quoted on request.")}</p></div>
+  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability and payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
   <div class="shop">{cards}</div>
   <p class="muted" style="margin-top:36px;text-align:center">{T("Procura algo diferente?", "Looking for something different?")} <a class="link" href="servicos.html#pecas">{T("Peça uma peça personalizada", "Commission a custom piece")} →</a></p>
 </div></section>
-<div class="veil"></div>
-<aside class="drawer" aria-label="Carrinho">
-  <header>{T("O seu carrinho", "Your cart", "h3")}<button aria-label="Fechar">×</button></header>
-  <div class="items"></div>
-  <footer><div class="total">{T("Total", "Total")}<b>0,00 €</b></div><small class="muted">{T("Portes calculados na confirmação.", "Shipping calculated on confirmation.")}</small>
-  <button class="btn btn-solid checkout" type="button">{ICON["wa"]}{T("Encomendar por WhatsApp", "Order via WhatsApp")}</button></footer>
-</aside>
-''' + foot()
+''' + foot(on_shop=True)
 
 
 # ------------------------------------------------------------------ CONTACT
@@ -616,8 +637,8 @@ def faq():
              "Depende da peça. Peças em porcelana fria demoram normalmente 2 a 3 semanas. Cerâmica, que precisa de secar e ir ao forno, 3 a 5 semanas. Para eventos, fale comigo com a maior antecedência possível.",
              "It depends on the piece. Cold porcelain usually takes 2–3 weeks. Ceramics, which need to dry and be kiln-fired, take 3–5 weeks. For events, get in touch as early as you can."),
             ("Fazem entregas?", "Do you deliver?",
-             "Sim. Peças prontas são enviadas até 24 horas após o pagamento, em embalagem protetora personalizada. Também pode levantar no ateliê em São Félix da Marinha. Envio internacional com portes sob orçamento por email.",
-             "Yes. Ready-made pieces ship within 24 hours of payment, in custom protective packaging. You can also collect from the studio in São Félix da Marinha. International shipping is quoted by email."),
+             "Sim. Assim que o pagamento é confirmado, envio a peça em embalagem protetora personalizada, na data que combinarmos. Também pode levantar no ateliê em São Félix da Marinha. Envio internacional com portes sob orçamento por email.",
+             "Yes. Once payment is confirmed I send the piece in custom protective packaging, agreeing the day with you. You can also collect from the studio in São Félix da Marinha. International shipping is quoted by email."),
             ("Como posso pagar?", "How can I pay?",
              "MB WAY ou transferência bancária. Nas encomendas personalizadas é pedido um sinal para iniciar o trabalho.",
              "MB WAY or bank transfer. Custom commissions require a deposit to begin."),

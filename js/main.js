@@ -122,37 +122,73 @@
     lb.addEventListener("touchend", (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1)); x0 = null; });
   }
 
-  /* ---------- Shop / cart ---------- */
+  /* ---------- Shop / cart (the drawer is in the footer of every page) ---------- */
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem("mc-cart") || "[]"); if (!Array.isArray(cart)) cart = []; }
   catch { cart = []; }
   const eur = (n) => n.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
   const save = () => localStorage.setItem("mc-cart", JSON.stringify(cart));
-  function renderCart() {
+  const drawer = $("#cart"), veil = $(".veil");
+  let cartOpen = false, cartTrigger = null;
+
+  function renderCart(added) {
     const n = cart.reduce((s, i) => s + i.q, 0);
-    $$(".cart-count").forEach((c) => { c.textContent = n || ""; c.dataset.n = n; });
+    $$(".cart-count").forEach((c) => {
+      const was = +c.dataset.n || 0;
+      c.textContent = n || ""; c.dataset.n = n;
+      if (added && n > was) { c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+    });
     const box = $(".drawer .items");
     if (!box) return;
     if (!cart.length) {
-      box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}</p>`;
+      box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite a loja e junte as suas peças favoritas.", "Have a look at the shop and add your favourite pieces.")}</small></p>`;
     } else {
-      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${eur(i.p)}</small></div><button data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
+      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
     }
-    $(".drawer .total b").textContent = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
-    $(".drawer .checkout").toggleAttribute("disabled", !cart.length);
-    $(".drawer .checkout").style.opacity = cart.length ? 1 : .5;
+    const tot = $(".drawer .total b"), co = $(".drawer .checkout");
+    if (tot) tot.textContent = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
+    if (co) { co.toggleAttribute("disabled", !cart.length); co.style.opacity = cart.length ? 1 : .5; }
   }
-  const drawer = $(".drawer"), veil = $(".veil");
-  const openCart = (o) => { if (!drawer) return; drawer.classList.toggle("open", o); veil.classList.toggle("open", o); };
-  $$(".cart-btn").forEach((b) => b.addEventListener("click", (e) => { if (drawer) { e.preventDefault(); openCart(true); } }));
+
+  function openCart(o) {
+    if (!drawer || cartOpen === o) return;
+    if (o) cartTrigger = document.activeElement;
+    cartOpen = o;
+    const setInert = (el, on) => { if (el) on ? el.setAttribute("inert", "") : el.removeAttribute("inert"); };
+    setInert(drawer, !o);
+    // while open, the rest of the page goes inert too (the veil stays clickable: it closes the cart)
+    $$("body > *").forEach((el) => { if (el !== drawer && el !== veil) setInert(el, o); });
+    drawer.classList.toggle("open", o);
+    if (veil) veil.classList.toggle("open", o);
+    drawer.setAttribute("aria-hidden", o ? "false" : "true");
+    document.body.classList.toggle("locked", o);
+    $$(".cart-btn").forEach((b) => b.setAttribute("aria-expanded", o ? "true" : "false"));
+    if (o) { const x = $("[data-cart-close]", drawer); if (x) x.focus(); }
+    else {
+      const back = cartTrigger && cartTrigger !== document.body && document.contains(cartTrigger) ? cartTrigger : $(".cart-btn");
+      if (back) back.focus();
+      cartTrigger = null;
+    }
+  }
+  // the cart icon in the header (and in the mobile bar) opens the drawer on any page
+  $$(".cart-btn").forEach((b) => b.addEventListener("click", (e) => {
+    if (!drawer) { const h = b.getAttribute("href"); if (h) location.href = h; return; } // no drawer: fall back to the shop
+    e.preventDefault(); openCart(true);
+  }));
   if (drawer) {
-    $(".drawer header button").onclick = () => openCart(false);
-    veil.onclick = () => openCart(false);
+    // ×, the veil and "keep shopping" all close it
+    document.addEventListener("click", (e) => {
+      const c = e.target.closest("[data-cart-close]");
+      if (!c) return;
+      e.preventDefault(); openCart(false);
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cartOpen) openCart(false); });
     drawer.addEventListener("click", (e) => {
       const rm = e.target.closest("[data-rm]");
       if (rm) { cart.splice(+rm.dataset.rm, 1); save(); renderCart(); }
     });
-    $(".drawer .checkout").onclick = () => {
+    const co = $(".drawer .checkout");
+    if (co) co.onclick = () => {
       if (!cart.length) return;
       const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
       const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
@@ -168,7 +204,7 @@
       const d = p.dataset, q = Math.max(1, +inp.value || 1);
       const ex = cart.find((i) => i.id === d.id);
       ex ? (ex.q += q) : cart.push({ id: d.id, pt: d.npt, en: d.nen, p: +d.price, img: $("img", p).getAttribute("src"), q });
-      save(); renderCart(); inp.value = 1; openCart(true);
+      save(); renderCart(true); inp.value = 1; openCart(true);
     };
   });
 
