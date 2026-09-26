@@ -9,8 +9,10 @@
 Save the new photo in `img/` **with the same name** as the old one (e.g. `torno.jpg`) and it updates across the whole site. Recommended: JPG, max. 1600 px, under 400 KB.
 
 ## Shop
-In `build.py`, edit the `PRODUCTS` list (id, image, PT name, EN name, price, descriptions). The cart sends the order through WhatsApp; you confirm payment by MB WAY or bank transfer.
-**The current prices are examples. Replace them with your real prices.**
+The shop mirrors the **WhatsApp Business catalog** (https://wa.me/c/149207197470727): in `build.py`, edit the `SHOP` list — categories, each with items `(id, image, PT name, EN name, price, PT desc, EN desc)`.
+- Use `None` as the price to show “Sob consulta / Price on request” (the cart total then shows “A combinar / To be agreed”). **Set your real prices when you have them.**
+- `img/brinco-1…5.jpg` and `img/presepio-3.jpg` are generated placeholders (see `img/_make_placeholders.py`) — replace them with the real photos, same names, when you have them.
+- After editing, run `python3 build.py`. The cart sends the order through WhatsApp; you confirm payment by MB WAY or bank transfer.
 The cart panel (the `cart_drawer()` helper in `build.py`) is part of the shared footer, so it exists on **every**
 page and the basket icon in the header just opens it wherever the visitor is — only the product grid lives on
 `loja.html`. The basket itself is kept in the visitor's browser (localStorage), so the items are still there when

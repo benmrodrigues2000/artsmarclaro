@@ -143,10 +143,11 @@
     if (!cart.length) {
       box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite a loja e junte as suas peças favoritas.", "Have a look at the shop and add your favourite pieces.")}</small></p>`;
     } else {
-      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
+      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${i.p == null ? t("sob consulta", "price on request") : eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
     }
     const tot = $(".drawer .total b"), co = $(".drawer .checkout");
-    if (tot) tot.textContent = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
+    const priced = cart.filter((i) => i.p != null);
+    if (tot) tot.textContent = cart.length && priced.length < cart.length ? t("A combinar", "To be agreed") : eur(priced.reduce((s, i) => s + i.q * i.p, 0));
     if (co) { co.toggleAttribute("disabled", !cart.length); co.style.opacity = cart.length ? 1 : .5; }
   }
 
@@ -190,8 +191,8 @@
     const co = $(".drawer .checkout");
     if (co) co.onclick = () => {
       if (!cart.length) return;
-      const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
-      const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
+      const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${i.p == null ? t("sob consulta", "price on request") : eur(i.p)})`).join("\n");
+      const tot = cart.some((i) => i.p == null) ? t("A combinar", "To be agreed") : eur(cart.reduce((s, i) => s + i.q * i.p, 0));
       const msg = t(`Olá Claudia! Gostava de encomendar:\n${lines}\nTotal: ${tot}\n\nNome:\nMorada de entrega (ou levantamento no ateliê):`,
                     `Hi Claudia! I'd like to order:\n${lines}\nTotal: ${tot}\n\nName:\nDelivery address (or pick-up at the studio):`);
       window.open(waLink(msg), "_blank", "noopener");

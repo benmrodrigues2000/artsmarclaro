@@ -546,32 +546,100 @@ def portfolio():
 
 # ------------------------------------------------------------------ SHOP
 # Edit products here: id, image, name PT, name EN, price (EUR), description PT, EN
-PRODUCTS = [
-    ("difusor", "difusor.jpg", "Difusor de aromas perfurado", "Pierced aroma diffuser", 38, "Cerâmica, feito à mão. Ø aprox. 14 cm.", "Handmade ceramic. Approx. Ø 14 cm."),
-    ("bandeja", "bandeja.jpg", "Bandeja floral", "Floral tray", 32, "Cerâmica com relevo floral. Aprox. 25 × 15 cm.", "Ceramic with floral relief. Approx. 25 × 15 cm."),
-    ("caneca", "caneca-pers.jpg", "Caneca pintada à mão", "Hand-painted mug", 24, "Pode ser personalizada com nome.", "Can be personalised with a name."),
-    ("figura", "figura-branca.jpg", "Figura “Serenidade”", "“Serenity” figure", 45, "Escultura em cerâmica branca. Aprox. 22 cm.", "White ceramic sculpture. Approx. 22 cm."),
-    ("familia", "familias.jpg", "Família em cerâmica", "Ceramic family", 55, "Conjunto de figuras sobre base de madeira.", "Set of figures on a wooden base."),
-    ("presepio", "presepio-argila.jpg", "Presépio em argila", "Clay nativity", 60, "Peça única, pintada à mão.", "One-of-a-kind, hand-painted."),
+# The shop mirrors the WhatsApp Business catalog (https://wa.me/c/149207197470727).
+# Each item: (id, image, PT name, EN name, price or None → "Sob consulta", PT desc, EN desc)
+SHOP = [
+    ("Bijuteria cerâmica", "Ceramic jewellery", [
+        ("brinco-1", "brinco-1.jpg", "Brincos de cerâmica – Modelo 1", "Ceramic earrings – Model 1", None,
+         "Brincos leves e únicos, feitos à mão em cerâmica. Ideais para o dia a dia.",
+         "Light, one-of-a-kind earrings, handmade in ceramic. Ideal for everyday wear."),
+        ("brinco-2", "brinco-2.jpg", "Brincos de cerâmica – Modelo 2", "Ceramic earrings – Model 2", None,
+         "Peça exclusiva em cerâmica artesanal, leve e confortável de usar.",
+         "Exclusive piece in artisan ceramic, light and comfortable to wear."),
+        ("brinco-3", "brinco-3.jpg", "Brincos de cerâmica – Modelo 3", "Ceramic earrings – Model 3", None,
+         "Design delicado e artístico em cerâmica, criado manualmente.",
+         "Delicate, artistic ceramic design, hand-crafted."),
+        ("brinco-4", "brinco-4.jpg", "Brincos de cerâmica – Modelo 4", "Ceramic earrings – Model 4", None,
+         "Brincos criativos em cerâmica, feitos com técnica artesanal.",
+         "Creative ceramic earrings, made with artisan technique."),
+        ("brinco-5", "brinco-5.jpg", "Brincos de cerâmica – Modelo 5", "Ceramic earrings – Model 5", None,
+         "Leves e elegantes, estes brincos de cerâmica artesanal são perfeitos para todos os dias.",
+         "Light and elegant, these artisan ceramic earrings are perfect for every day."),
+    ]),
+    ("Peças em cerâmica", "Ceramic pieces", [
+        ("pers", "caneca-carolina.jpg", "Personalizados em cerâmica", "Custom ceramic pieces", None,
+         "Feito à tua medida, exclusivo e único. Crio peças personalizadas com o teu nome, data ou tema.",
+         "Made to your measure, exclusive and one of a kind. I create custom pieces with your name, date or theme."),
+        ("deco", "figura-branca.jpg", "Decorativos em cerâmica", "Decorative ceramic pieces", None,
+         "Decoração artística para qualquer espaço. Esculturas, figuras e peças de decoração.",
+         "Artistic decoration for any space. Sculptures, figures and decorative pieces."),
+        ("artes", "figurinha-festa.jpg", "Artesanato em cerâmica", "Handmade ceramic pieces", None,
+         "Tradição e criatividade em barro. Peças artesanais para oferecer ou colecionar.",
+         "Tradition and creativity in clay. Handmade pieces to give or collect."),
+        ("util", "maos-tigela.jpg", "Utilitários em cerâmica", "Useful ceramic pieces", None,
+         "Tigelas, travessas, canecas e pequenas utilidades em cerâmica, feitas à mão para o dia a dia.",
+         "Bowls, platters, mugs and small everyday pieces in ceramic, handmade for daily use."),
+        ("topos", "topo-casamento.jpg", "Topos de bolo personalizados", "Custom cake toppers", None,
+         "Topos de bolo à tua medida — casamentos, aniversários e qualquer data especial.",
+         "Cake toppers made to measure — weddings, birthdays and any special occasion."),
+    ]),
+    ("Serviços", "Services", [
+        ("coworking", "atelier.jpg", "Coworking criativo no atelier", "Creative coworking at the studio", None,
+         "Usa o atelier e os recursos disponíveis para criar as tuas próprias peças, com acompanhamento.",
+         "Use the studio and its resources to create your own pieces, with guidance."),
+        ("aulas-ceramica", "torno.jpg", "Aulas de cerâmica", "Ceramic classes", None,
+         "Aulas mensais de cerâmica com acompanhamento personalizado.",
+         "Monthly ceramic classes with personalised guidance."),
+        ("aulas-porcelana", "pintura-figura.jpg", "Aulas de porcelana fria", "Cold porcelain classes", None,
+         "Aulas regulares de porcelana fria para desenvolver projetos e novas técnicas.",
+         "Regular cold porcelain classes to develop projects and new techniques."),
+        ("workshop", "aula-grupo.jpg", "Workshop criativo", "Creative workshop", None,
+         "Workshops temáticos no atelier. Um dia inteiro a criar, com materiais e acompanhamento incluídos.",
+         "Themed workshops at the studio. A full day of creating, with materials and guidance included."),
+    ]),
+    ("Presépios artesanais", "Handmade nativity scenes", [
+        ("presepio-1", "presepio-1.jpg", "Presépio em cerâmica – Modelo 1", "Ceramic nativity – Model 1", None,
+         "Presépio em cerâmica com a Sagrada Família em mantos decorados, acompanhado do berço.",
+         "Ceramic nativity with the Holy Family in decorated robes, with the crib."),
+        ("presepio-2", "presepio-2.jpg", "Presépio em cerâmica – Modelo 2", "Ceramic nativity – Model 2", None,
+         "Estábulo em cerâmica com a Sagrada Família e a estrela de Belém.",
+         "Ceramic stable with the Holy Family and the star of Bethlehem."),
+        ("presepio-3", "presepio-3.jpg", "Presépio em cerâmica – Modelo 3", "Ceramic nativity – Model 3", None,
+         "Peça original em cerâmica artesanal, que representa a Sagrada Família.",
+         "Original piece in artisan ceramic, representing the Holy Family."),
+        ("presepio-4", "presepio.jpg", "Presépio em cerâmica – Modelo 4", "Ceramic nativity – Model 4", None,
+         "Presépio em cerâmica feito à mão, cada detalhe pensado com carinho.",
+         "Handmade ceramic nativity, every detail lovingly crafted."),
+        ("presepio-5", "presepio-argila.jpg", "Presépio em cerâmica – Modelo 5", "Ceramic nativity – Model 5", None,
+         "Presépio exclusivo em cerâmica, peça de coleção e decoração.",
+         "Exclusive ceramic nativity, a collectible and decorative piece."),
+    ]),
 ]
+PRODUCTS = [p for _, _, items in SHOP for p in items]
+
+
+PHOTOS_PENDING = {f"brinco-{i}.jpg" for i in range(1, 6)} | {f"presepio-{i}.jpg" for i in range(1, 4)}  # on-brand placeholders until real photos arrive
 
 
 def shop():
-    cards = "".join(f'''<article class="prod rv" data-id="{i}" data-npt="{escape(pt)}" data-nen="{escape(en)}" data-price="{p}">
-  <div class="img">{IMG(s, pt, en)}</div>
-  <div class="body">{T(pt, en, "h3")}{T(dpt, den, "p", "muted")}<span class="price">{f"{p:.2f}".replace(".", ",")} €</span>
+    blocks = []
+    for cpt, cen, items in SHOP:
+        cards = "".join(f'''<article class="prod rv" data-id="{i}" data-npt="{escape(pt)}" data-nen="{escape(en)}" data-price="{"" if p is None else p}">
+  <div class="img">{IMG(s, pt + " — fotografia em breve", en + " — photo coming soon") if s in PHOTOS_PENDING else IMG(s, pt, en)}</div>
+  <div class="body">{T(pt, en, "h3")}{T(dpt, den, "p", "muted")}{'<span class="price">' + (f"{p:.2f}".replace(".", ",") + " €") + '</span>' if p is not None else T("Sob consulta", "Price on request", "span", "price nc")}
   <div class="row"><div class="qty"><button type="button" data-d="-1" aria-label="-">−</button><input type="number" value="1" min="1" max="20" aria-label="Quantidade"><button type="button" data-d="1" aria-label="+">+</button></div>
   <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
-</article>''' for i, s, pt, en, p, dpt, den in PRODUCTS)
+</article>''' for i, s, pt, en, p, dpt, den in items)
+        blocks.append(f'<h3 class="shop-cat rv">{T(cpt, cen)}</h3>{cards}')
     return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
                 "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
-                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "difusor.jpg") + \
+                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "caneca-carolina.jpg") + \
         page_hero("Loja", "Shop", "Peças prontas, <em>à sua espera.</em>", "Ready-made pieces, <em>waiting for you.</em>",
                   "Peças únicas feitas à mão e prontas a enviar. Quando se esgotam, não voltam iguais.",
                   "One-of-a-kind handmade pieces, ready to ship. Once they’re gone, they won’t come back the same.") + f'''
 <section style="padding-top:10px"><div class="wrap">
-  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability and payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
-  <div class="shop">{cards}</div>
+  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ou serviços ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade e o preço (quando sob consulta), o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces or services to your cart and click “Order via WhatsApp”. I’ll confirm availability and the price (when on request), payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
+  <div class="shop">{"".join(blocks)}</div>
   <p class="muted" style="margin-top:36px;text-align:center">{T("Procura algo diferente?", "Looking for something different?")} <a class="link" href="servicos.html#pecas">{T("Peça uma peça personalizada", "Commission a custom piece")} →</a></p>
 </div></section>
 ''' + foot(on_shop=True)
