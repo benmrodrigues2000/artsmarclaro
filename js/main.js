@@ -1,10 +1,16 @@
 /* Marclaro — site behaviour (no dependencies) */
 (function () {
   const WA = "351919758281";
-  const EMAIL = "claudimar60@gmail.com";
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
-  let lang = localStorage.getItem("mc-lang") === "en" ? "en" : "pt";
+  // A blocked or unavailable browser store must not break navigation or forms.
+  const storage = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch { /* session only */ } },
+    remove(key) { try { localStorage.removeItem(key); } catch { /* already unavailable */ } }
+  };
+  storage.remove("mc-consent"); // Retire the old analytics choice; no analytics are loaded.
+  let lang = storage.get("mc-lang") === "en" ? "en" : "pt";
   const t = (pt, en) => (lang === "en" ? en : pt);
 
   /* ---------- Language ---------- */
@@ -34,7 +40,7 @@
   $$(".lang button").forEach((b) =>
     b.addEventListener("click", () => {
       lang = b.dataset.lang;
-      localStorage.setItem("mc-lang", lang);
+      storage.set("mc-lang", lang);
       applyLang();
     })
   );
@@ -50,6 +56,14 @@
       a.target = "_blank";
       a.rel = "noopener";
     });
+  }
+
+  function trapDialog(event, dialog) {
+    if (event.key !== "Tab") return;
+    const focusable = [...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(el => el.getClientRects().length && !el.closest('[hidden]'));
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
   }
 
   /* ---------- Mobile nav ---------- */
@@ -95,7 +109,8 @@
 
   const lb = $(".lb");
   if (lb) {
-    let idx = 0;
+    let idx = 0, lightboxTrigger = null;
+    lb.addEventListener("keydown", (e) => trapDialog(e, lb));
     const visible = () => $$(".masonry .item:not(.hide)");
     const show = (i) => {
       const v = visible(); idx = (i + v.length) % v.length;
@@ -104,9 +119,21 @@
       $("p", lb).textContent = img.alt;
     };
     $$(".masonry .item").forEach((it) => it.addEventListener("click", () => {
-      show(visible().indexOf(it)); lb.classList.add("open"); document.body.style.overflow = "hidden"; $(".x", lb).focus();
+      lightboxTrigger = it;
+      show(visible().indexOf(it)); lb.classList.add("open"); document.body.style.overflow = "hidden";
+      // The lightbox lives inside main; make its siblings and the surrounding UI inert.
+      [...document.body.children, ...$("main").children].forEach((el) => {
+        if (el !== lb && el.tagName !== "MAIN" && !el.hasAttribute("inert")) {
+          el.setAttribute("inert", ""); el.dataset.lightboxInert = "";
+        }
+      });
+      $(".x", lb).focus();
     }));
-    const close = () => { lb.classList.remove("open"); document.body.style.overflow = ""; };
+    const close = () => {
+      lb.classList.remove("open"); document.body.style.overflow = "";
+      $$("[data-lightbox-inert]").forEach((el) => { el.removeAttribute("inert"); delete el.dataset.lightboxInert; });
+      lightboxTrigger?.focus();
+    };
     $(".x", lb).onclick = close;
     $(".prev", lb).onclick = () => show(idx - 1);
     $(".next", lb).onclick = () => show(idx + 1);
@@ -124,14 +151,37 @@
 
   /* ---------- Shop / cart (the drawer is in the footer of every page) ---------- */
   let cart = [];
-  try { cart = JSON.parse(localStorage.getItem("mc-cart") || "[]"); if (!Array.isArray(cart)) cart = []; }
+  try { cart = JSON.parse(storage.get("mc-cart") || "[]"); if (!Array.isArray(cart)) cart = []; }
   catch { cart = []; }
+  cart = cart.filter((i) => i && typeof i.id === "string" && typeof i.pt === "string" &&
+    typeof i.en === "string" && typeof i.img === "string" && /^img\/[a-z0-9-]+\.jpg$/.test(i.img) &&
+    Number.isFinite(i.p) && i.p >= 0 && Number.isInteger(i.q) && i.q > 0 && i.q <= 20);
+  const html = (value) => String(value).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
   const eur = (n) => n.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
-  const save = () => localStorage.setItem("mc-cart", JSON.stringify(cart));
+  const save = () => storage.set("mc-cart", JSON.stringify(cart));
   const drawer = $("#cart"), veil = $(".veil");
+  const checkoutForm = $("#checkout-form");
   let cartOpen = false, cartTrigger = null;
 
+  function checkoutStep(show, focus = false) {
+    if (!checkoutForm) return;
+    checkoutForm.hidden = !show;
+    $(".items", drawer).hidden = show;
+    $("footer", drawer).hidden = show;
+    $(".checkout", drawer).setAttribute("aria-expanded", String(show));
+    if (focus) (show ? $("#checkout-name") : $(".checkout", drawer)).focus();
+  }
+
+  function clearCheckoutStatus() {
+    if (!checkoutForm) return;
+    $("[data-checkout-status]", checkoutForm).hidden = true;
+    $("[data-checkout-link]", checkoutForm).removeAttribute("href");
+  }
+
   function renderCart(added) {
+    clearCheckoutStatus();
     const n = cart.reduce((s, i) => s + i.q, 0);
     $$(".cart-count").forEach((c) => {
       const was = +c.dataset.n || 0;
@@ -141,7 +191,14 @@
     const box = $(".drawer .items");
     if (!box) return;
     if (!cart.length) {
-      box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite a loja e junte as suas peças favoritas.", "Have a look at the shop and add your favourite pieces.")}</small></p>`;
+      checkoutStep(false);
+      if (checkoutForm) {
+        checkoutForm.reset();
+        $("#checkout-address").disabled = false;
+        $("#checkout-address").required = true;
+        $("[data-checkout-address]").hidden = false;
+      }
+      box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite o catálogo e junte as suas peças favoritas.", "Have a look at the catalogue and add your favourite pieces.")}</small></p>`;
     } else {
       box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${i.p == null ? t("sob consulta", "price on request") : eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
     }
@@ -155,6 +212,7 @@
     if (!drawer || cartOpen === o) return;
     if (o) cartTrigger = document.activeElement;
     cartOpen = o;
+    if (!o) checkoutStep(false);
     const setInert = (el, on) => { if (el) on ? el.setAttribute("inert", "") : el.removeAttribute("inert"); };
     setInert(drawer, !o);
     // while open, the rest of the page goes inert too (the veil stays clickable: it closes the cart)
@@ -177,6 +235,7 @@
     e.preventDefault(); openCart(true);
   }));
   if (drawer) {
+    drawer.addEventListener("keydown", (e) => trapDialog(e, drawer));
     // ×, the veil and "keep shopping" all close it
     document.addEventListener("click", (e) => {
       const c = e.target.closest("[data-cart-close]");
@@ -197,14 +256,59 @@
                     `Hi Claudia! I'd like to order:\n${lines}\nTotal: ${tot}\n\nName:\nDelivery address (or pick-up at the studio):`);
       window.open(waLink(msg), "_blank", "noopener");
     };
+    if (checkoutForm) {
+      $("[data-checkout-back]", checkoutForm).onclick = () => checkoutStep(false, true);
+      const delivery = $("#checkout-delivery"), address = $("#checkout-address");
+      delivery.addEventListener("change", () => {
+        const shipping = delivery.value === "shipping";
+        $("[data-checkout-address]", checkoutForm).hidden = !shipping;
+        address.disabled = !shipping;
+        address.required = shipping;
+        address.setCustomValidity("");
+        clearCheckoutStatus();
+      });
+      checkoutForm.addEventListener("input", (e) => {
+        e.target.setCustomValidity?.("");
+        clearCheckoutStatus();
+      });
+      checkoutForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!cart.length) return;
+        // Native validation handles email/required fields; also reject whitespace-only text.
+        $$("[required]", checkoutForm).forEach((el) => {
+          if (!el.disabled && el.type !== "checkbox") {
+            el.setCustomValidity(el.value.trim() ? "" : t("Preencha este campo.", "Please fill in this field."));
+          }
+        });
+        if (!checkoutForm.reportValidity()) return;
+        const values = new FormData(checkoutForm);
+        const value = (key) => String(values.get(key) || "").trim();
+        const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
+        const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
+        const details = [
+          `${t("Nome", "Name")}: ${value("name")}`,
+          `Email: ${value("email")}`,
+          `${t("Telefone", "Phone")}: ${value("phone")}`,
+          `${t("Entrega", "Delivery")}: ${delivery.selectedOptions[0].textContent}`,
+          delivery.value === "shipping" ? `${t("Morada", "Address")}: ${value("address")}` : "",
+          value("notes") ? `${t("Observações", "Notes")}: ${value("notes")}` : ""
+        ].filter(Boolean).join("\n");
+        const msg = `${t("Olá Claudia! Gostava de encomendar:", "Hi Claudia! I'd like to order:")}\n${lines}\nTotal: ${tot}\n${t("Portes a confirmar.", "Shipping to be confirmed.")}\n\n${details}`;
+        const url = waLink(msg);
+        $("[data-checkout-link]", checkoutForm).href = url;
+        $("[data-checkout-status]", checkoutForm).hidden = false;
+        window.open(url, "_blank", "noopener");
+        $("[data-checkout-status]", checkoutForm).scrollIntoView({ block: "nearest" });
+      });
+    }
   }
   $$(".prod").forEach((p) => {
     const inp = $(".qty input", p);
     $$(".qty button", p).forEach((b) => b.onclick = () => { inp.value = Math.max(1, Math.min(20, (+inp.value || 1) + (+b.dataset.d))); });
     $(".add", p).onclick = () => {
-      const d = p.dataset, q = Math.max(1, +inp.value || 1);
+      const d = p.dataset, q = Math.max(1, Math.min(20, Math.floor(+inp.value || 1)));
       const ex = cart.find((i) => i.id === d.id);
-      ex ? (ex.q += q) : cart.push({ id: d.id, pt: d.npt, en: d.nen, p: +d.price, img: $("img", p).getAttribute("src"), q });
+      ex ? (ex.q = Math.min(20, ex.q + q)) : cart.push({ id: d.id, pt: d.npt, en: d.nen, p: +d.price, img: $("img", p).getAttribute("src"), q });
       save(); renderCart(true); inp.value = 1; openCart(true);
     };
   });
@@ -256,31 +360,16 @@
   const qs = new URLSearchParams(location.search);
   ["assunto", "servico"].forEach((k) => { const v = qs.get(k), el = document.getElementsByName(k)[0]; if (v && el) el.value = v; });
 
-  /* ---------- Newsletter ---------- */
-  $$(".news").forEach((n) => n.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const em = $("input", n).value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { $("input", n).focus(); return; }
-    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Newsletter")}&body=${encodeURIComponent(t("Quero receber novidades: ", "Please add me: ") + em)}`;
-    $("input", n).value = ""; $("input", n).placeholder = t("Obrigada!", "Thank you!");
-  }));
-
-  /* ---------- Cookie notice (GDPR) + analytics only after consent ---------- */
-  const ck = $(".cookie"), consent = localStorage.getItem("mc-consent");
-  function loadAnalytics() {
-    // Plausible (privacy-friendly). Replace data-domain once the domain is live.
-    const s = document.createElement("script");
-    s.defer = true; s.dataset.domain = "marclaroarts.pt"; s.src = "https://plausible.io/js/script.js";
-    document.head.appendChild(s);
-  }
-  if (ck) {
-    if (!consent) setTimeout(() => ck.classList.add("show"), 900);
-    else if (consent === "yes") loadAnalytics();
-    $$(".cookie [data-c]").forEach((b) => b.onclick = () => {
-      localStorage.setItem("mc-consent", b.dataset.c); ck.classList.remove("show");
-      if (b.dataset.c === "yes") loadAnalytics();
-    });
-  }
+  /* ---------- Local storage controls (no analytics or optional cookies) ---------- */
+  const clearStorage = $("[data-clear-storage]");
+  if (clearStorage) clearStorage.addEventListener("click", () => {
+    ["mc-lang", "mc-cart", "mc-consent"].forEach((key) => storage.remove(key));
+    cart = []; renderCart();
+    const status = $("[data-storage-status]");
+    status.dataset.pt = "O idioma guardado foi apagado e o carrinho está vazio. O idioma desta página mantém-se até sair.";
+    status.dataset.en = "Your saved language was cleared and the cart is empty. This page keeps its language until you leave.";
+    status.textContent = t(status.dataset.pt, status.dataset.en);
+  });
 
   $$(".year").forEach((y) => (y.textContent = new Date().getFullYear()));
   applyLang();
