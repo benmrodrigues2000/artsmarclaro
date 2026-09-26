@@ -60,7 +60,7 @@
 
   function trapDialog(event, dialog) {
     if (event.key !== "Tab") return;
-    const focusable = [...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),[tabindex="0"]')];
+    const focusable = [...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(el => el.getClientRects().length && !el.closest('[hidden]'));
     const first = focusable[0], last = focusable[focusable.length - 1];
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
@@ -162,9 +162,26 @@
   const eur = (n) => n.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
   const save = () => storage.set("mc-cart", JSON.stringify(cart));
   const drawer = $("#cart"), veil = $(".veil");
+  const checkoutForm = $("#checkout-form");
   let cartOpen = false, cartTrigger = null;
 
+  function checkoutStep(show, focus = false) {
+    if (!checkoutForm) return;
+    checkoutForm.hidden = !show;
+    $(".items", drawer).hidden = show;
+    $("footer", drawer).hidden = show;
+    $(".checkout", drawer).setAttribute("aria-expanded", String(show));
+    if (focus) (show ? $("#checkout-name") : $(".checkout", drawer)).focus();
+  }
+
+  function clearCheckoutStatus() {
+    if (!checkoutForm) return;
+    $("[data-checkout-status]", checkoutForm).hidden = true;
+    $("[data-checkout-link]", checkoutForm).removeAttribute("href");
+  }
+
   function renderCart(added) {
+    clearCheckoutStatus();
     const n = cart.reduce((s, i) => s + i.q, 0);
     $$(".cart-count").forEach((c) => {
       const was = +c.dataset.n || 0;
@@ -174,6 +191,13 @@
     const box = $(".drawer .items");
     if (!box) return;
     if (!cart.length) {
+      checkoutStep(false);
+      if (checkoutForm) {
+        checkoutForm.reset();
+        $("#checkout-address").disabled = false;
+        $("#checkout-address").required = true;
+        $("[data-checkout-address]").hidden = false;
+      }
       box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite o catálogo e junte as suas peças favoritas.", "Have a look at the catalogue and add your favourite pieces.")}</small></p>`;
     } else {
       box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${html(lang === "en" ? i.en : i.pt)}</b><small>${i.q} × ${eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
@@ -187,6 +211,7 @@
     if (!drawer || cartOpen === o) return;
     if (o) cartTrigger = document.activeElement;
     cartOpen = o;
+    if (!o) checkoutStep(false);
     const setInert = (el, on) => { if (el) on ? el.setAttribute("inert", "") : el.removeAttribute("inert"); };
     setInert(drawer, !o);
     // while open, the rest of the page goes inert too (the veil stays clickable: it closes the cart)
@@ -223,13 +248,53 @@
     });
     const co = $(".drawer .checkout");
     if (co) co.onclick = () => {
-      if (!cart.length) return;
-      const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
-      const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
-      const msg = t(`Olá Claudia! Gostava de encomendar:\n${lines}\nTotal: ${tot}\n\nNome:\nMorada de entrega (ou levantamento no ateliê):`,
-                    `Hi Claudia! I'd like to order:\n${lines}\nTotal: ${tot}\n\nName:\nDelivery address (or pick-up at the studio):`);
-      window.open(waLink(msg), "_blank", "noopener");
+      if (cart.length) checkoutStep(true, true);
     };
+    if (checkoutForm) {
+      $("[data-checkout-back]", checkoutForm).onclick = () => checkoutStep(false, true);
+      const delivery = $("#checkout-delivery"), address = $("#checkout-address");
+      delivery.addEventListener("change", () => {
+        const shipping = delivery.value === "shipping";
+        $("[data-checkout-address]", checkoutForm).hidden = !shipping;
+        address.disabled = !shipping;
+        address.required = shipping;
+        address.setCustomValidity("");
+        clearCheckoutStatus();
+      });
+      checkoutForm.addEventListener("input", (e) => {
+        e.target.setCustomValidity?.("");
+        clearCheckoutStatus();
+      });
+      checkoutForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!cart.length) return;
+        // Native validation handles email/required fields; also reject whitespace-only text.
+        $$("[required]", checkoutForm).forEach((el) => {
+          if (!el.disabled && el.type !== "checkbox") {
+            el.setCustomValidity(el.value.trim() ? "" : t("Preencha este campo.", "Please fill in this field."));
+          }
+        });
+        if (!checkoutForm.reportValidity()) return;
+        const values = new FormData(checkoutForm);
+        const value = (key) => String(values.get(key) || "").trim();
+        const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
+        const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
+        const details = [
+          `${t("Nome", "Name")}: ${value("name")}`,
+          `Email: ${value("email")}`,
+          `${t("Telefone", "Phone")}: ${value("phone")}`,
+          `${t("Entrega", "Delivery")}: ${delivery.selectedOptions[0].textContent}`,
+          delivery.value === "shipping" ? `${t("Morada", "Address")}: ${value("address")}` : "",
+          value("notes") ? `${t("Observações", "Notes")}: ${value("notes")}` : ""
+        ].filter(Boolean).join("\n");
+        const msg = `${t("Olá Claudia! Gostava de encomendar:", "Hi Claudia! I'd like to order:")}\n${lines}\nTotal: ${tot}\n${t("Portes a confirmar.", "Shipping to be confirmed.")}\n\n${details}`;
+        const url = waLink(msg);
+        $("[data-checkout-link]", checkoutForm).href = url;
+        $("[data-checkout-status]", checkoutForm).hidden = false;
+        window.open(url, "_blank", "noopener");
+        $("[data-checkout-status]", checkoutForm).scrollIntoView({ block: "nearest" });
+      });
+    }
   }
   $$(".prod").forEach((p) => {
     const inp = $(".qty input", p);
