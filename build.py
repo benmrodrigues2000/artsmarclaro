@@ -63,6 +63,9 @@ MSG_HELLO = ("Olá Claudia! Vim do site da Marclaro e tenho uma questão.",
 
 
 def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
+    def navlink(h, pt, en):
+        cur = ' aria-current="page"' if h == file else ""
+        return f'<a href="{h}"{cur}>{T(pt, en)}</a>'
     return f'''<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -82,7 +85,7 @@ def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
 <meta name="theme-color" content="#E6D3B3">
 <link rel="icon" href="img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -100,8 +103,8 @@ def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
     <button class="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
     <a class="brand" href="index.html" aria-label="Marclaro — início"><img src="img/logo.png" alt="Claudia Sousa art´s marclaro — Handmade with love" width="120" height="54"></a>
     <nav class="nav" aria-label="Principal">
-      <div class="nav-l">{"".join(f'<a href="{h}"{" aria-current=page" if h == file else ""}>{T(pt, en)}</a>' for h, pt, en in NAV[:3])}</div>
-      <div class="nav-r">{"".join(f'<a href="{h}"{" aria-current=page" if h == file else ""}>{T(pt, en)}</a>' for h, pt, en in NAV[3:])}</div>
+      <div class="nav-l">{"".join(navlink(h, pt, en) for h, pt, en in NAV[:3])}</div>
+      <div class="nav-r">{"".join(navlink(h, pt, en) for h, pt, en in NAV[3:])}</div>
     </nav>
     <a class="cart-btn cart-m" href="loja.html" aria-label="Carrinho / Cart">{ICON["cart"]}<span class="cart-count"></span></a>
   </div>
@@ -532,8 +535,6 @@ def shop():
   <div class="row"><div class="qty"><button type="button" data-d="-1" aria-label="-">−</button><input type="number" value="1" min="1" max="20" aria-label="Quantidade"><button type="button" data-d="1" aria-label="+">+</button></div>
   <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
 </article>''' for i, s, pt, en, p, dpt, den in PRODUCTS)
-    # prod article uses data-en for cart name; exclude from language swap by renaming attr
-    cards = cards.replace('class="prod rv" data-id', 'class="prod rv" data-id')
     return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
                 "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp, envio em 24 horas.",
                 "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, dispatched within 24 hours.", "difusor.jpg") + \

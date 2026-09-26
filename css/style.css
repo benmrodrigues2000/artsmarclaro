@@ -1,8 +1,4 @@
-/* =========================================================
-   Marclaro — Gestalt design system
-   Symmetry · Closure · Continuity · Similarity · Proximity ·
-   Common region · Figure–ground · Focal point
-   ========================================================= */
+/* Marclaro — site styles (plain CSS, no build step) */
 :root{
   --sand:#E6D3B3; --coffee:#664228; --espresso:#432108;
   --caramel:#BA9976; --taupe:#987555; --white:#FFFFFF;
@@ -11,11 +7,11 @@
   --sans:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --r:28px; --wrap:1240px;
   --ease:cubic-bezier(.2,.7,.2,1);
-  /* spacing scale: tight inside groups, wide between groups (proximity) */
+  /* spacing scale */
   --in:10px; --grp:28px; --sec:clamp(90px,12vw,160px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;scroll-padding-top:120px}
+html{scroll-behavior:smooth;scroll-padding-top:130px}
 body{background:var(--sand);color:var(--espresso);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:clip}
 img{display:block;max-width:100%;height:auto}
 a{color:inherit}
@@ -25,7 +21,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- type ---------- */
 h1,h2,h3{font-family:var(--serif);color:var(--coffee);font-weight:400;line-height:1.02;letter-spacing:-.025em}
-h1{font-size:clamp(2.7rem,7vw,6.4rem)}
+h1{font-size:clamp(2.35rem,7vw,6.4rem)}
 h2{font-size:clamp(2.1rem,4.6vw,3.8rem)}
 h3{font-size:clamp(1.3rem,2vw,1.6rem);line-height:1.2}
 h1 em,h2 em{font-style:italic;color:var(--taupe)}
@@ -37,7 +33,7 @@ h1 em,h2 em{font-style:italic;color:var(--taupe)}
 p+p{margin-top:1em}
 .muted{color:var(--taupe)}
 
-/* ---------- buttons: one shape (pill) = one meaning (action) ---------- */
+/* ---------- buttons & links ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 28px;border-radius:999px;font-weight:700;font-size:.95rem;text-decoration:none;border:1.5px solid var(--coffee);cursor:pointer;transition:all .3s var(--ease);white-space:nowrap}
 .btn-solid{background:var(--coffee);color:var(--sand)}
 .btn-solid:hover{background:var(--espresso);border-color:var(--espresso);transform:translateY(-2px)}
@@ -50,7 +46,7 @@ p+p{margin-top:1em}
 .cta-row{display:flex;gap:12px;flex-wrap:wrap}
 .cta-c{justify-content:center}
 
-/* ---------- header: symmetric nav | logo | nav ---------- */
+/* ---------- header & nav ---------- */
 .head{position:sticky;top:0;z-index:50;background:rgba(230,211,179,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .util{background:var(--espresso);color:var(--sand);font-size:.78rem}
 .util .wrap{display:flex;justify-content:space-between;align-items:center;height:40px}
@@ -88,7 +84,7 @@ p+p{margin-top:1em}
 .burger[aria-expanded="true"] span:nth-child(1){top:19px;transform:rotate(45deg)}
 .burger[aria-expanded="true"] span:nth-child(2){top:19px;transform:rotate(-45deg)}
 
-/* ---------- closure: open ring (incomplete circle the eye completes) ---------- */
+/* ---------- decorative rings ---------- */
 .ring{position:absolute;inset:-5%;width:110%;height:110%;pointer-events:none;overflow:visible;transform:rotate(-60deg)}
 .ring circle{fill:none;stroke:var(--coffee);stroke-width:1.1;stroke-dasharray:78 22;stroke-linecap:round;transition:stroke-dasharray 1.6s var(--ease)}
 .rv:not(.in) .ring circle{stroke-dasharray:0 100}
@@ -102,7 +98,7 @@ section.tight{padding:calc(var(--sec)*.55) 0}
 .split-head{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end;margin-bottom:clamp(40px,5vw,60px)}
 .split-head p{max-width:46ch}
 
-/* ---------- HERO: symmetric composition, focal centre ---------- */
+/* ---------- home hero ---------- */
 .hero-c{padding:clamp(56px,8vw,100px) 0 clamp(60px,7vw,90px);text-align:center;overflow:hidden}
 .hero-text{max-width:980px;margin:0 auto}
 .hero-c h1{margin:14px 0 26px}
@@ -124,7 +120,7 @@ section.tight{padding:calc(var(--sec)*.55) 0}
 .facts-bar>div+div{border-left:1.5px solid var(--line)}
 .facts-bar b{font-family:var(--serif);font-weight:400;font-size:1.9rem;color:var(--coffee);line-height:1}
 
-/* ---------- marquee (continuity) ---------- */
+/* ---------- marquee ---------- */
 .marquee{overflow:hidden;border-block:1.5px solid var(--coffee);padding:20px 0}
 .marquee div{display:flex;gap:40px;width:max-content;animation:mq 42s linear infinite;font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.3rem);color:var(--coffee)}
 .marquee span{display:flex;align-items:center;gap:40px}
@@ -132,7 +128,7 @@ section.tight{padding:calc(var(--sec)*.55) 0}
 .marquee span::after{content:"";width:12px;height:12px;border-radius:50%;border:1.5px solid var(--coffee)}
 @keyframes mq{to{transform:translateX(-50%)}}
 
-/* ---------- WORK RAIL: similar arches along a continuous line ---------- */
+/* ---------- home work rail ---------- */
 .rail{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:max(20px,calc((100vw - var(--wrap))/2));padding:0 max(20px,calc((100vw - var(--wrap))/2)) 10px;scrollbar-width:none}
 .rail::-webkit-scrollbar{display:none}
 .arch-card{flex:0 0 clamp(240px,24vw,320px);scroll-snap-align:start;text-decoration:none;display:flex;flex-direction:column;gap:var(--in)}
@@ -150,7 +146,7 @@ section.tight{padding:calc(var(--sec)*.55) 0}
 .rail-btn:hover{background:var(--coffee);color:var(--sand)}
 .rail-nav .link{margin-left:12px}
 
-/* ---------- FIGURE–GROUND: inverted coffee band with circle portrait ---------- */
+/* ---------- about band (dark) ---------- */
 .ground{background:var(--coffee);color:var(--sand)}
 .ground h2{color:var(--sand)}
 .ground h2 em{color:var(--caramel)}
@@ -165,7 +161,7 @@ section.tight{padding:calc(var(--sec)*.55) 0}
 .sign{font-family:var(--serif);font-style:italic;font-size:2rem;margin:24px 0 26px;color:inherit;opacity:.9}
 section:not(.ground) .sign{color:var(--coffee)}
 
-/* ---------- SERVICES: similar circles joined by one line (continuity) ---------- */
+/* ---------- service circle cards ---------- */
 .orbits{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,4vw,56px);position:relative;text-align:center}
 .orbit-line{position:absolute;left:16.6%;right:16.6%;top:calc(clamp(180px,20vw,250px)/2);height:1.5px;background:repeating-linear-gradient(90deg,var(--coffee) 0 8px,transparent 8px 16px)}
 .orb{text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:var(--in);position:relative}
@@ -175,7 +171,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .orb p{max-width:32ch;font-size:.95rem}
 .orb .link{margin-top:8px}
 
-/* ---------- COMMON REGION: one bounded panel groups related items ---------- */
+/* ---------- grouped feature panel ---------- */
 .region>*{min-width:0}
 .region{background:var(--white);border-radius:calc(var(--r) + 8px);padding:clamp(28px,5vw,64px);display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(30px,5vw,70px);align-items:center}
 .quad{display:grid;grid-template-columns:1fr 1fr;gap:1.5px;background:var(--sand);border-radius:var(--r);overflow:hidden}
@@ -184,7 +180,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .quad h3{font-size:1.2rem;margin-bottom:4px}
 .quad p{font-size:.92rem;color:var(--taupe)}
 
-/* ---------- Instagram: symmetric, focal centre ---------- */
+/* ---------- Instagram strip ---------- */
 .insta-sym{display:grid;grid-template-columns:1fr 1fr 1.6fr 1fr 1fr;gap:14px;align-items:center}
 .insta-sym a{aspect-ratio:1;border-radius:50%;overflow:hidden;display:block}
 .insta-sym a:nth-child(2),.insta-sym a:nth-child(4){aspect-ratio:3/4;border-radius:999px}
@@ -193,7 +189,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .insta-sym img{width:100%;height:100%;object-fit:cover;transition:.6s var(--ease)}
 .insta-sym a:hover img{transform:scale(1.08)}
 
-/* ---------- CTA band: figure (sand circle) on ground (espresso) ---------- */
+/* ---------- CTA band (dark) ---------- */
 .bg-dark{background:var(--espresso);color:var(--sand)}
 .bg-dark h2,.bg-dark h3{color:var(--sand)}
 .bg-dark .eyebrow{color:var(--caramel)}
@@ -208,15 +204,15 @@ section:not(.ground) .sign{color:var(--coffee)}
 .bg-dark .btn-line{color:var(--sand);border-color:var(--sand)}
 .bg-dark .btn-line:hover{background:var(--sand);color:var(--espresso)}
 
-/* ---------- PAGE HERO: centred, closure ring behind ---------- */
+/* ---------- page hero ---------- */
 .page-hero{text-align:center;padding:clamp(70px,9vw,120px) 0 clamp(40px,5vw,60px);overflow:hidden}
 .page-hero .wrap{position:relative;z-index:1}
-.page-hero h1{font-size:clamp(2.6rem,6.2vw,5.4rem);max-width:15ch;margin:10px auto 0}
+.page-hero h1{font-size:clamp(2.2rem,6.2vw,5.4rem);max-width:15ch;margin:10px auto 0}
 .page-hero .lead{margin:24px auto 0}
 .ph-ring{position:absolute;left:50%;top:50%;width:min(620px,110vw);transform:translate(-50%,-50%) rotate(-50deg);opacity:.5;pointer-events:none}
 .ph-ring circle{fill:none;stroke:var(--caramel);stroke-width:.8;stroke-dasharray:80 20;stroke-linecap:round}
 
-/* ---------- ABOUT: arch gallery (similarity) ---------- */
+/* ---------- about page gallery ---------- */
 .arch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end}
 .arch-grid .arch{aspect-ratio:3/4.4;border-radius:999px 999px var(--r) var(--r);overflow:hidden;background:var(--caramel)}
 .arch-grid .arch:nth-child(odd){transform:translateY(-28px)}
@@ -255,7 +251,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .bg-white{background:var(--white)}
 .bg-white .steps>div::before{background:var(--sand)}
 
-/* ---------- PORTFOLIO: uniform grid (similarity) ---------- */
+/* ---------- portfolio grid ---------- */
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:40px}
 .f-c{justify-content:center;background:var(--white);border-radius:999px;padding:6px;width:max-content;max-width:100%;margin:0 auto 48px}
 .filters button{border:0;background:none;border-radius:999px;padding:10px 18px;font-size:.86rem;font-weight:700;cursor:pointer;color:var(--coffee);transition:.25s}
@@ -306,7 +302,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .map{border-radius:calc(var(--r) + 6px);overflow:hidden;aspect-ratio:21/8;background:var(--caramel);margin-top:clamp(20px,3vw,34px)}
 .map iframe{width:100%;height:100%;border:0;filter:sepia(.4) saturate(.75)}
 
-/* ---------- FORMS: one common region, fields grouped by proximity ---------- */
+/* ---------- forms ---------- */
 .form{background:var(--white);border-radius:calc(var(--r) + 6px);padding:clamp(26px,4vw,44px);display:grid;gap:18px}
 .form .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .field label{display:block;font-size:.8rem;font-weight:700;margin-bottom:6px;color:var(--coffee)}
@@ -323,7 +319,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .ok.show{display:block}
 #reservar .contact-grid{align-items:center}
 
-/* ---------- FAQ: sticky group label beside its questions (proximity) ---------- */
+/* ---------- FAQ ---------- */
 .faq2{display:grid;gap:clamp(40px,6vw,80px)}
 .faq-sec{display:grid;grid-template-columns:.75fr 1.25fr;gap:clamp(30px,5vw,80px);align-items:start}
 .faq-side{position:sticky;top:150px}
@@ -344,7 +340,7 @@ section:not(.ground) .sign{color:var(--coffee)}
 .prose h2{font-size:1.6rem;margin:36px 0 10px}
 .prose h2:first-child{margin-top:0}
 
-/* ---------- FOOTER: centred brand, symmetric columns ---------- */
+/* ---------- footer ---------- */
 .foot{background:var(--espresso);color:var(--sand);padding:80px 0 30px;font-size:.93rem}
 .foot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;text-align:center}
 .foot-grid>div:first-child{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;padding-bottom:50px;border-bottom:1px solid rgba(230,211,179,.18)}
@@ -418,8 +414,8 @@ section:not(.ground) .sign{color:var(--coffee)}
   .brand{padding:0;justify-self:center}.brand img{height:44px}
   .burger{display:block;grid-area:x}
   .cart-m{display:flex;grid-area:c;justify-self:end}
-  .nav{display:flex;flex-direction:column;position:fixed;inset:114px 0 auto 0;background:var(--sand);padding:10px 20px 30px;border-bottom:1px solid var(--line);transform:translateY(-130%);transition:transform .45s var(--ease);z-index:-1;text-align:center}
-  .nav.open{transform:none}
+  .nav{display:flex;flex-direction:column;position:fixed;inset:114px 0 auto 0;background:var(--sand);padding:10px 20px 30px;border-bottom:1px solid var(--line);transform:translateY(-130%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s .45s;max-height:calc(100dvh - 114px);overflow-y:auto;overscroll-behavior:contain;z-index:-1;text-align:center}
+  .nav.open{transform:none;visibility:visible;transition:transform .45s var(--ease),visibility 0s}
   .nav-l,.nav-r{flex-direction:column;gap:0}
   .nav a{font-family:var(--serif);font-size:1.6rem;padding:12px 0;border-bottom:1px solid var(--line)}
   .nav a::after{display:none}
@@ -465,4 +461,11 @@ section:not(.ground) .sign{color:var(--coffee)}
   .quad{grid-template-columns:1fr}
   .quad>div{padding:22px 20px}
   .f-c{border-radius:22px}
+}
+
+@media (max-width:380px){
+  .facts-bar>div{font-size:.68rem;padding:12px 6px}
+  .facts-bar b{font-size:1.4rem}
+  .qty button{width:30px}
+  .notice{padding:16px 20px;font-size:.86rem}
 }
