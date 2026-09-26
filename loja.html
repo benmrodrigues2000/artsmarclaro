@@ -27,7 +27,7 @@
     <p class="util-tag"><span data-en="Handmade in Vila Nova de Gaia">Feito à mão em Vila Nova de Gaia</span></p>
     <div class="util-r">
       <div class="lang" role="group" aria-label="Idioma / Language"><button data-lang="pt" aria-pressed="true">PT</button><button data-lang="en" aria-pressed="false">EN</button></div>
-      <a class="cart-btn" href="loja.html" aria-label="Carrinho / Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cart-count"></span></a>
+      <button class="cart-btn" type="button" aria-controls="cart" aria-expanded="false" aria-label="Carrinho / Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cart-count"></span></button>
       <a class="util-quote" href="https://wa.me/351919758281" data-wa="Olá Claudia! Vi o seu trabalho no site e gostava de pedir um orçamento para uma peça." data-wa-en="Hi Claudia! I saw your work on the website and would like a quote for a piece."><span data-en="Request a quote">Pedir orçamento</span></a>
     </div>
   </div></div>
@@ -38,7 +38,7 @@
       <div class="nav-l"><a href="index.html"><span data-en="Home">Início</span></a><a href="sobre.html"><span data-en="About">Sobre</span></a><a href="servicos.html"><span data-en="Services">Serviços</span></a></div>
       <div class="nav-r"><a href="portfolio.html"><span data-en="Work">Portefólio</span></a><a href="loja.html" aria-current="page"><span data-en="Shop">Loja</span></a><a href="contacto.html"><span data-en="Contact">Contacto</span></a><a href="faq.html"><span data-en="FAQ">Perguntas Frequentes</span></a></div>
     </nav>
-    <a class="cart-btn cart-m" href="loja.html" aria-label="Carrinho / Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cart-count"></span></a>
+    <button class="cart-btn cart-m" type="button" aria-controls="cart" aria-expanded="false" aria-label="Carrinho / Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cart-count"></span></button>
   </div>
 </header>
 <main id="main">
@@ -82,13 +82,6 @@
 </article></div>
   <p class="muted" style="margin-top:36px;text-align:center"><span data-en="Looking for something different?">Procura algo diferente?</span> <a class="link" href="servicos.html#pecas"><span data-en="Commission a custom piece">Peça uma peça personalizada</span> →</a></p>
 </div></section>
-<div class="veil"></div>
-<aside class="drawer" aria-label="Carrinho">
-  <header><h3 data-en="Your cart">O seu carrinho</h3><button aria-label="Fechar">×</button></header>
-  <div class="items"></div>
-  <footer><div class="total"><span data-en="Total">Total</span><b>0,00 €</b></div><small class="muted"><span data-en="Shipping calculated on confirmation.">Portes calculados na confirmação.</span></small>
-  <button class="btn btn-solid checkout" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 12 2.2a9.8 9.8 0 0 1 0 19.6M12 0a12 12 0 0 0-10.3 18L0 24l6.2-1.6A12 12 0 1 0 12 0"/></svg><span data-en="Order via WhatsApp">Encomendar por WhatsApp</span></button></footer>
-</aside>
 </main>
 <footer class="foot">
   <div class="wrap">
@@ -134,6 +127,16 @@
   <p><span data-en="We only use essential cookies and, with your permission, anonymous statistics to improve the site.">Usamos apenas cookies essenciais e, com a sua autorização, estatísticas anónimas para melhorar o site.</span> <a class="link" href="privacidade.html"><span data-en="Learn more">Saber mais</span></a></p>
   <div class="cta-row"><button class="btn btn-solid btn-sm" data-c="yes"><span data-en="Accept">Aceitar</span></button><button class="btn btn-line btn-sm" data-c="no"><span data-en="Decline">Recusar</span></button></div>
 </div>
+
+<div class="veil" data-cart-close></div>
+<aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Carrinho / Cart" aria-hidden="true" inert>
+  <header><h3 data-en="Your cart">O seu carrinho</h3><button type="button" data-cart-close aria-label="Fechar / Close">×</button></header>
+  <div class="items"></div>
+  <footer><div class="total"><span data-en="Total">Total</span><b>0,00 €</b></div><small class="muted"><span data-en="Shipping calculated on confirmation.">Portes calculados na confirmação.</span></small>
+  <button class="btn btn-solid checkout" type="button" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 12 2.2a9.8 9.8 0 0 1 0 19.6M12 0a12 12 0 0 0-10.3 18L0 24l6.2-1.6A12 12 0 1 0 12 0"/></svg><span data-en="Order via WhatsApp">Encomendar por WhatsApp</span></button>
+  <button class="btn btn-line btn-sm" type="button" data-cart-close><span data-en="Keep shopping">Continuar a comprar</span></button></footer>
+</aside>
+
 <script src="js/main.js" defer></script>
 </body>
 </html>

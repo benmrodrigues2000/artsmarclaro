@@ -11,6 +11,10 @@ Save the new photo in `img/` **with the same name** as the old one (e.g. `torno.
 ## Shop
 In `build.py`, edit the `PRODUCTS` list (id, image, PT name, EN name, price, descriptions). The cart sends the order through WhatsApp; you confirm payment by MB WAY or bank transfer.
 **The current prices are examples. Replace them with your real prices.**
+The cart panel (the `cart_drawer()` helper in `build.py`) is part of the shared footer, so it exists on **every**
+page and the basket icon in the header just opens it wherever the visitor is — only the product grid lives on
+`loja.html`. The basket itself is kept in the visitor's browser (localStorage), so the items are still there when
+they move between pages.
 
 ## Portfolio
 In `build.py`, the `PORT` list: image, categories (`ceramica`, `porcelana`, `personalizadas`, `aulas`), PT caption, EN caption.
