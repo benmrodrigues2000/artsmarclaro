@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Generates the Marclaro static site (8 HTML pages) from shared templates.
+"""Generates the Marclaro static site (HTML pages) from shared templates.
 Edit text here, then run:  python3 build.py
 """
 from html import escape
+from legal_content import LEGAL_PAGES
 
 SITE = "https://marclaroarts.pt"
 WA_NUM = "351919758281"
@@ -44,7 +45,7 @@ def cart_drawer(on_shop=False):
     for a "keep shopping" button, since the products are already on screen."""
     more = (f'<button class="btn btn-line btn-sm" type="button" data-cart-close>{T("Continuar a comprar", "Keep shopping")}</button>'
             if on_shop else
-            f'<a class="btn btn-line btn-sm" href="loja.html">{T("Ver a loja", "Browse the shop")}</a>')
+            f'<a class="btn btn-line btn-sm" href="loja.html">{T("Ver o catálogo", "Browse the catalogue")}</a>')
     return f'''
 <div class="veil" data-cart-close></div>
 <aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Carrinho / Cart" aria-hidden="true" inert>
@@ -52,6 +53,7 @@ def cart_drawer(on_shop=False):
   <div class="items"></div>
   <footer><div class="total">{T("Total", "Total")}<b>0,00 €</b></div><small class="muted">{T("Portes calculados na confirmação.", "Shipping calculated on confirmation.")}</small>
   <button class="btn btn-solid checkout" type="button" disabled>{ICON["wa"]}{T("Encomendar por WhatsApp", "Order via WhatsApp")}</button>
+  <p class="cart-terms">{T('O envio da mensagem é um pedido, não uma compra concluída. Consulte os <a href="termos.html">termos</a> e as <a href="envios-devolucoes.html">condições de envio e devolução</a>.', 'Sending the message is a request, not a completed purchase. Read the <a href="termos.html">terms</a> and <a href="envios-devolucoes.html">shipping and returns policy</a>.')}</p>
   {more}</footer>
 </aside>
 '''
@@ -78,7 +80,7 @@ NAV = [
     ("sobre.html", "Sobre", "About"),
     ("servicos.html", "Serviços", "Services"),
     ("portfolio.html", "Portefólio", "Work"),
-    ("loja.html", "Loja", "Shop"),
+    ("loja.html", "Catálogo", "Catalogue"),
     ("contacto.html", "Contacto", "Contact"),
     ("faq.html", "Perguntas Frequentes", "FAQ"),
 ]
@@ -109,13 +111,11 @@ def head(file, title_pt, title_en, desc_pt, desc_en, img="hero.jpg"):
 <meta property="og:image" content="{SITE}/img/{img}">
 <meta property="og:locale" content="pt_PT"><meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#E6D3B3">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="icon" href="img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="page-{file.removesuffix(".html")}">
 <a class="skip" href="#main">Saltar para o conteúdo</a>
 <header class="head">
   <div class="util"><div class="wrap">
@@ -168,24 +168,25 @@ def foot(on_shop=False):
         </ul>
       </div>
       <div>
-        <h4>Newsletter</h4>
-        <p>{T("Novas peças, datas de aulas e experiências. Pouco e bom.", "New pieces, class dates and experiences. Rarely, and only the good stuff.")}</p>
-        <form class="news" novalidate><label class="skip" for="nl">Email</label><input id="nl" type="email" placeholder="o seu email" data-en-ph="your email" autocomplete="email"><button type="submit">→</button></form>
+        <h4>{T("Informação legal", "Legal information")}</h4>
+        <ul>
+          <li><a href="privacidade.html">{T("Privacidade", "Privacy")}</a></li>
+          <li><a href="cookies.html">{T("Cookies e armazenamento", "Cookies and storage")}</a></li>
+          <li><a href="termos.html">{T("Termos e condições", "Terms and conditions")}</a></li>
+          <li><a href="envios-devolucoes.html">{T("Envios e devoluções", "Shipping and returns")}</a></li>
+          <li><a href="https://www.livroreclamacoes.pt/Inicio/" target="_blank" rel="noopener">{T("Livro de Reclamações", "Complaints Book")} ↗</a></li>
+        </ul>
       </div>
     </div>
     <div class="foot-bottom">
       <span>© <span class="year">2026</span> Claudia Sousa Art´s Marclaro. {T("Feito à mão, com carinho.", "Handmade, with love.")}</span>
-      <span><a href="privacidade.html">{T("Política de privacidade", "Privacy policy")}</a></span>
+      <span>{T("Um ateliê. Peças únicas. Feitas com tempo.", "One studio. Unique pieces. Made with time.")}</span>
     </div>
   </div>
 </footer>
 
 <a class="wa" href="https://wa.me/{WA_NUM}" data-wa="{escape(MSG_HELLO[0])}" data-wa-en="{escape(MSG_HELLO[1])}" aria-label="WhatsApp">{ICON["wa"]}<span data-en="Message me">Fale comigo</span></a>
 
-<div class="cookie" role="dialog" aria-label="Cookies">
-  <p>{T("Usamos apenas cookies essenciais e, com a sua autorização, estatísticas anónimas para melhorar o site.", "We only use essential cookies and, with your permission, anonymous statistics to improve the site.")} <a class="link" href="privacidade.html">{T("Saber mais", "Learn more")}</a></p>
-  <div class="cta-row"><button class="btn btn-solid btn-sm" data-c="yes">{T("Aceitar", "Accept")}</button><button class="btn btn-line btn-sm" data-c="no">{T("Recusar", "Decline")}</button></div>
-</div>
 {cart_drawer(on_shop)}
 <script src="js/main.js" defer></script>
 </body>
@@ -193,17 +194,18 @@ def foot(on_shop=False):
 '''
 
 
-def page_hero(eyebrow_pt, eyebrow_en, h_pt, h_en, lead_pt, lead_en):
-    return f'''<section class="page-hero"><svg class="ph-ring" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" pathLength="100"/></svg><div class="wrap">
+def page_hero(eyebrow_pt, eyebrow_en, h_pt, h_en, lead_pt, lead_en, actions=""):
+    return f'''<section class="page-hero"><div class="wrap">
   {T(eyebrow_pt, eyebrow_en, "p", "eyebrow eb-c")}
   {T(h_pt, h_en, "h1", "rv")}
   {T(lead_pt, lead_en, "p", "lead rv")}
+{actions}
 </div></section>'''
 
 
 def band(h_pt, h_en, p_pt, p_en, second=None):
     sec = second or f'<a class="btn btn-line" href="servicos.html#reservar">{T("Reservar aula", "Book a class")}</a>'
-    return f'''<section class="bg-dark band"><div class="band-circle" aria-hidden="true"></div><div class="wrap">
+    return f'''<section class="bg-dark band"><div class="wrap">
   {T("Vamos criar juntos", "Let’s make something", "p", "eyebrow eb-c")}
   {T(h_pt, h_en, "h2", "rv")}
   {T(p_pt, p_en, "p", "rv")}
@@ -228,8 +230,6 @@ def home():
         for i, (s, a, ae, l, le) in enumerate(works))
     insta_imgs = ["figurinha-festa.jpg", "maos-tigela.jpg", "torno.jpg", "familias.jpg", "pintura-flor.jpg"]
     insta = "".join(f'<a href="{IG}" target="_blank" rel="noopener">{IMG(s, "Publicação do Instagram @marclaroarts", "Instagram post @marclaroarts")}</a>' for s in insta_imgs)
-    marquee_items = ["Feito à mão", "Peças com alma", "Cerâmica", "Porcelana fria", "Aulas & experiências", "Vila Nova de Gaia"]
-    mq = "".join(f"<span>{x}</span>" for x in marquee_items * 2)
     svc = [
         ("pecas", "topo-casamento.jpg", "Peças personalizadas", "Custom pieces", "Topos de bolo, figuras, canecas e peças decorativas feitas à sua medida, a partir da sua ideia.", "Cake toppers, figurines, mugs and decorative pieces made to measure, from your idea."),
         ("aulas", "aula-grupo.jpg", "Aulas &amp; formação", "Classes &amp; training", "Cerâmica e porcelana fria, individual ou em grupo. Do primeiro contacto com a argila ao seu próprio projeto.", "Ceramics and cold porcelain, one-to-one or in groups. From first touching clay to your own project."),
@@ -258,9 +258,9 @@ def home():
   <div class="trio">
     <div class="t-side t-l">{IMG("topo-casal.jpg", "Figura de casal em porcelana fria", "Cold porcelain couple figurine", lazy=False)}</div>
     <div class="t-main">
-      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" pathLength="100"/></svg>
+
       <div class="t-circle">{IMG("torno.jpg", "Claudia Sousa a trabalhar uma peça na roda de oleiro", "Claudia Sousa shaping a piece on the banding wheel", lazy=False)}</div>
-      <svg class="stamp" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="c" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0"/></defs><text><textPath href="#c">HANDMADE WITH LOVE · MARCLARO ·</textPath></text><circle cx="50" cy="50" r="4" fill="#664228"/></svg>
+
     </div>
     <div class="t-side t-r">{IMG("difusor.jpg", "Difusor de cerâmica perfurado", "Pierced ceramic diffuser", lazy=False)}</div>
   </div>
@@ -271,7 +271,7 @@ def home():
   </div>
 </div></section>
 
-<div class="marquee" aria-hidden="true"><div>{mq}</div></div>
+
 
 <section class="works-sec"><div class="wrap">
   <div class="split-head">
@@ -287,7 +287,7 @@ def home():
 
 <section class="ground"><div class="wrap about-c">
   <div class="portrait rv">
-    <svg class="ring ring-light" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" pathLength="100"/></svg>
+
     <div class="p-circle">{IMG("atelier.jpg", "Claudia Sousa no seu ateliê", "Claudia Sousa in her studio")}</div>
   </div>
   <div class="about-txt rv">
@@ -304,7 +304,7 @@ def home():
 
 <section><div class="wrap">
   <div class="center-head">{T("O que faço", "What I do", "p", "eyebrow eb-c")}{T("Três formas de <em>trabalharmos juntos</em>", "Three ways to <em>work together</em>", "h2")}</div>
-  <div class="orbits"><div class="orbit-line" aria-hidden="true"></div>{orbit}</div>
+  <div class="orbits">{orbit}</div>
 </div></section>
 
 <section class="tight"><div class="wrap">
@@ -343,7 +343,7 @@ def about():
                   "Marclaro is Claudia Sousa’s studio: a calm space where clay and cold porcelain become unique pieces, and where visitors learn to do the same.") + f'''
 <section class="ground"><div class="wrap about-c">
   <div class="portrait rv">
-    <svg class="ring ring-light" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" pathLength="100"/></svg>
+
     <div class="p-circle">{IMG("torno.jpg", "Claudia Sousa a moldar uma taça", "Claudia Sousa shaping a bowl")}</div>
   </div>
   <div class="about-txt rv">
@@ -394,7 +394,7 @@ def services():
         n = {"pecas": "01", "aulas": "02", "experiencias": "03"}[id_]
         return f'''<div class="svc2{' rev' if rev else ''}" id="{id_}">
   <div class="cluster rv">
-    <svg class="ring" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" pathLength="100"/></svg>
+
     <div class="c-lg">{IMG(m, ma, mb)}</div>{sm}
     <span class="c-num">{n}</span>
   </div>
@@ -485,9 +485,10 @@ def services():
       <div class="field"><label for="b-pax">{T("N.º de pessoas", "No. of people")}</label><input id="b-pax" name="pessoas" type="number" min="1" max="12" value="1"></div>
     </div>
     <div class="field"><label for="b-msg">{T("Notas", "Notes")}</label><textarea id="b-msg" name="notas" placeholder="Horário preferido, experiência anterior, ocasião…" data-en-ph="Preferred time, previous experience, occasion…"></textarea></div>
-    <label class="check"><input type="checkbox" name="rgpd" required><span>{T('Aceito que os meus dados sejam usados para responder a este pedido (<a class="link" href="privacidade.html">privacidade</a>).', 'I agree my details are used to reply to this request (<a class="link" href="privacidade.html">privacy</a>).')}</span></label>
+    <p class="form-note">{T("Este formulário abre o WhatsApp com os dados preenchidos. Só serão enviados quando confirmar a mensagem no WhatsApp. Se preferir, contacte-me por email.", "This form opens WhatsApp with your details filled in. They are only sent when you confirm the message in WhatsApp. You can also contact me by email.")}</p>
+    <label class="check"><input type="checkbox" name="rgpd" required><span>{T('Li a informação sobre o tratamento dos meus dados para responder a este pedido (<a class="link" href="privacidade.html">privacidade</a>).', 'I have read how my details are used to reply to this request (<a class="link" href="privacidade.html">privacy</a>).')}</span></label>
     <button class="btn btn-solid" type="submit">{T("Enviar pedido de marcação", "Send booking request")}</button>
-    <div class="ok" role="status">{T("Obrigada! O seu pedido foi preparado no WhatsApp. Confirmo a disponibilidade em breve.", "Thank you! Your request was prepared in WhatsApp. I’ll confirm availability shortly.")}</div>
+    <div class="ok" role="status">{T("O pedido está preparado. Confirme o envio no WhatsApp para que eu o possa receber.", "Your request is ready. Confirm sending it in WhatsApp so I can receive it.")}</div>
   </form>
 </div></section>
 ''' + band("Ainda com dúvidas?", "Still have questions?",
@@ -524,7 +525,7 @@ PORT = [
 
 
 def portfolio():
-    items = "".join(f'<button class="item" data-cat="{c}" aria-label="{escape(pt)}">{IMG(s, pt, en)}{T(pt, en)}</button>' for s, c, pt, en in PORT)
+    items = "".join(f'<button class="item" data-cat="{c}">{IMG(s, pt, en)}{T(pt, en)}</button>' for s, c, pt, en in PORT)
     fl = [("all", "Tudo", "All"), ("ceramica", "Cerâmica", "Ceramics"), ("porcelana", "Porcelana fria", "Cold porcelain"),
           ("personalizadas", "Peças personalizadas", "Custom pieces"), ("aulas", "Aulas &amp; experiências", "Classes &amp; experiences")]
     fb = "".join(f'<button data-filter="{k}" aria-pressed="{"true" if k == "all" else "false"}">{T(a, b)}</button>' for k, a, b in fl)
@@ -532,15 +533,30 @@ def portfolio():
                 "Portfolio — Ceramics & cold porcelain work | Marclaro",
                 "Galeria de peças em cerâmica e porcelana fria feitas à mão: topos de bolo, figuras, canecas personalizadas, presépios e aulas.",
                 "Gallery of handmade ceramic and cold porcelain pieces: cake toppers, figurines, personalised mugs, nativity scenes and classes.", "topo-casamento.jpg") + \
-        page_hero("Portefólio", "Work", "Cada peça, <em>uma história.</em>", "Every piece, <em>a story.</em>",
-                  "Amostras de encomendas já entregues e momentos do ateliê. Gostou de alguma? Envie-me uma mensagem e fazemos a sua.",
-                  "A selection of delivered commissions and studio moments. See one you love? Send me a message and we’ll make yours.") + f'''
-<section style="padding-top:10px"><div class="wrap">
+        page_hero("Portefólio · Claudia Sousa", "Portfolio · Claudia Sousa", "Um percurso feito <em>à mão.</em>", "A journey <em>made by hand.</em>",
+                  "Da porcelana fria à cerâmica, das primeiras figuras à partilha no ateliê. O meu percurso, contado através das peças que crio.",
+                  "From cold porcelain to ceramics, from the first figurines to sharing in the studio. My journey, told through the pieces I make.",
+                  actions=f'<a class="link portfolio-jump" href="#trabalhos">{T("Explorar os trabalhos", "Explore the work")} ↓</a>') + f'''
+<section class="journey" aria-labelledby="journey-title"><div class="wrap journey-grid">
+  <figure>{IMG("torno.jpg", "Claudia Sousa a trabalhar a argila no ateliê", "Claudia Sousa working with clay in the studio", lazy=False)}<figcaption>{T("Claudia Sousa · Ateliê Marclaro, Vila Nova de Gaia", "Claudia Sousa · Marclaro studio, Vila Nova de Gaia")}</figcaption></figure>
+  <div>
+    {T("O meu percurso", "My journey", "p", "eyebrow")}
+    {T("Dar forma. Criar memórias. Partilhar.", "Shaping. Making memories. Sharing.", "h2", attrs='id="journey-title"')}
+    <ol class="journey-list">
+      <li><span class="journey-number">01</span><div>{T("Os primeiros gestos", "The first gestures", "h3")}{T("Comecei pela porcelana fria, a modelar pequenas figuras para as festas de amigos e família. Topos de bolo, lembranças e presépios: cada peça nascia de uma história.", "I started with cold porcelain, modelling small figures for friends’ and family celebrations. Cake toppers, keepsakes and nativity scenes: each piece began with a story.", "p")}</div></li>
+      <li><span class="journey-number">02</span><div>{T("O encontro com a cerâmica", "Discovering ceramics", "h3")}{T("Depois chegaram o barro, a roda e o forno. Hoje trabalho as duas técnicas lado a lado, explorando formas, texturas e acabamentos feitos à mão.", "Then came clay, the wheel and the kiln. Today I work with both techniques side by side, exploring handmade forms, textures and finishes.", "p")}</div></li>
+      <li><span class="journey-number">03</span><div>{T("Um ateliê para partilhar", "A studio for sharing", "h3")}{T("Em São Félix da Marinha, o meu trabalho continua nas encomendas personalizadas e nas aulas e experiências de quem vem aprender comigo.", "In São Félix da Marinha, my work continues through custom commissions and classes and experiences for those who come to learn with me.", "p")}</div></li>
+    </ol>
+    <a class="link" href="sobre.html">{T("Conhecer melhor a minha história", "Read more of my story")} →</a>
+  </div>
+</div></section>
+<section class="portfolio-work" id="trabalhos"><div class="wrap">
+  <div class="split-head"><div>{T("Trabalhos selecionados", "Selected work", "p", "eyebrow")}{T("Peças, histórias e processos.", "Pieces, stories and processes.", "h2")}</div>{T("Encomendas realizadas e momentos de criação. Selecione uma categoria e abra cada fotografia para ver os detalhes.", "Completed commissions and moments of making. Choose a category and open a photograph to see the details.", "p")}</div>
   <div class="filters f-c" role="group" aria-label="Filtrar">{fb}</div>
   <div class="masonry grid-u">{items}</div>
   <div style="text-align:center;margin-top:50px">{WA("Quero uma peça assim", "I want a piece like this", "Olá Claudia! Vi o portefólio e gostava de uma peça semelhante a uma que vi no site.", "Hi Claudia! I saw your portfolio and would like a piece similar to one on the website.")}</div>
 </div></section>
-<div class="lb" role="dialog" aria-modal="true" aria-label="Imagem"><button class="x" aria-label="Fechar">×</button><button class="prev" aria-label="Anterior">‹</button><img src="" alt=""><button class="next" aria-label="Seguinte">›</button><p></p></div>
+<div class="lb" role="dialog" aria-modal="true" aria-label="Imagem"><button class="x" aria-label="Fechar">×</button><button class="prev" aria-label="Anterior">‹</button><img alt=""><button class="next" aria-label="Seguinte">›</button><p></p></div>
 ''' + foot()
 
 
@@ -561,17 +577,18 @@ def shop():
   <div class="img">{IMG(s, pt, en)}</div>
   <div class="body">{T(pt, en, "h3")}{T(dpt, den, "p", "muted")}<span class="price">{f"{p:.2f}".replace(".", ",")} €</span>
   <div class="row"><div class="qty"><button type="button" data-d="-1" aria-label="-">−</button><input type="number" value="1" min="1" max="20" aria-label="Quantidade"><button type="button" data-d="1" aria-label="+">+</button></div>
-  <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
+  <button class="btn btn-line add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
 </article>''' for i, s, pt, en, p, dpt, den in PRODUCTS)
-    return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
-                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
-                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "difusor.jpg") + \
-        page_hero("Loja", "Shop", "Peças prontas, <em>à sua espera.</em>", "Ready-made pieces, <em>waiting for you.</em>",
-                  "Peças únicas feitas à mão e prontas a enviar. Quando se esgotam, não voltam iguais.",
-                  "One-of-a-kind handmade pieces, ready to ship. Once they’re gone, they won’t come back the same.") + f'''
+    return head("loja.html", "Catálogo — Peças de cerâmica feitas à mão | Marclaro", "Catalogue — Handmade ceramic pieces | Marclaro",
+                "Descubra peças de cerâmica feitas à mão. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
+                "Discover handmade ceramic pieces. Simple ordering via WhatsApp, with delivery or studio pick-up.", "difusor.jpg") + \
+        page_hero("Catálogo", "Catalogue", "Objetos feitos <em>com tempo.</em>", "Objects made <em>with time.</em>",
+                  "Cerâmica feita à mão, peça a peça. Escolha as suas favoritas e confirme a disponibilidade comigo.",
+                  "Handmade ceramics, piece by piece. Choose your favourites and check availability with me.") + f'''
 <section style="padding-top:10px"><div class="wrap">
-  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability and payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
+  <div class="catalogue-meta">{T("Peças em cerâmica", "Ceramic pieces", "p")}<span>{len(PRODUCTS)} {T("peças", "pieces")}</span></div>
   <div class="shop">{cards}</div>
+  <details class="buying-info"><summary>{T("Como encomendar, pagamentos e entregas", "Ordering, payment and delivery")}</summary><div>{T('Adicione as peças ao carrinho e envie o pedido por WhatsApp. Antes de qualquer pagamento, confirmo a disponibilidade, o valor total com portes e o prazo. Pagamento por MB WAY ou transferência bancária. Pode combinar o levantamento no ateliê. Consulte os <a href="termos.html">termos e condições</a> e a política de <a href="envios-devolucoes.html">envios e devoluções</a>.', 'Add your pieces to the cart and send a request via WhatsApp. Before any payment, I confirm availability, the total including shipping and the timeline. Pay by MB WAY or bank transfer, or arrange studio collection. Read our <a href="termos.html">terms and conditions</a> and <a href="envios-devolucoes.html">shipping and returns policy</a>.', "p")}</div></details>
   <p class="muted" style="margin-top:36px;text-align:center">{T("Procura algo diferente?", "Looking for something different?")} <a class="link" href="servicos.html#pecas">{T("Peça uma peça personalizada", "Commission a custom piece")} →</a></p>
 </div></section>
 ''' + foot(on_shop=True)
@@ -613,12 +630,13 @@ def contact():
           <option value="outro" data-en="Other">Outro</option>
         </select><span class="err">{T("Escolha um assunto.", "Please choose a subject.")}</span></div>
       <div class="field"><label for="c-msg">{T("Mensagem", "Message")} *</label><textarea id="c-msg" name="mensagem" required placeholder="Conte-me a sua ideia, data ou dúvida…" data-en-ph="Tell me your idea, date or question…"></textarea><span class="err">{T("Escreva a sua mensagem.", "Please write your message.")}</span></div>
-      <label class="check"><input type="checkbox" name="rgpd" required><span>{T('Aceito que os meus dados sejam usados para responder a esta mensagem (<a class="link" href="privacidade.html">privacidade</a>).', 'I agree my details are used to reply to this message (<a class="link" href="privacidade.html">privacy</a>).')}</span></label>
+      <p class="form-note">{T("Este formulário abre o WhatsApp com os dados preenchidos. Só serão enviados quando confirmar a mensagem no WhatsApp. Se preferir, contacte-me por email.", "This form opens WhatsApp with your details filled in. They are only sent when you confirm the message in WhatsApp. You can also contact me by email.")}</p>
+    <label class="check"><input type="checkbox" name="rgpd" required><span>{T('Li a informação sobre o tratamento dos meus dados para responder a esta mensagem (<a class="link" href="privacidade.html">privacidade</a>).', 'I have read how my details are used to reply to this message (<a class="link" href="privacidade.html">privacy</a>).')}</span></label>
       <button class="btn btn-solid" type="submit">{T("Enviar mensagem", "Send message")}</button>
-      <div class="ok" role="status">{T("Obrigada pela sua mensagem! Respondo o mais breve possível, normalmente em 24 horas.", "Thank you for your message! I’ll reply as soon as possible, usually within 24 hours.")}</div>
+      <div class="ok" role="status">{T("A mensagem está preparada. Confirme o envio no WhatsApp para que eu a possa receber.", "Your message is ready. Confirm sending it in WhatsApp so I can receive it.")}</div>
     </form>
   </div>
-  <div class="map rv"><iframe title="Mapa: São Félix da Marinha, Vila Nova de Gaia" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=4410+S%C3%A3o+F%C3%A9lix+da+Marinha,+Vila+Nova+de+Gaia,+Portugal&z=14&output=embed"></iframe></div>
+  <div class="map-link rv"><div>{T("Visite o ateliê", "Visit the studio", "h2")}{T("São Félix da Marinha, Vila Nova de Gaia. Visitas por marcação.", "São Félix da Marinha, Vila Nova de Gaia. Visits by appointment.", "p")}{T("O mapa abre num serviço externo, sujeito à política de privacidade da Google.", "The map opens on an external service, subject to Google's privacy policy.", "p", "muted")}</div><a class="btn btn-line" href="https://www.google.com/maps?q=São+Félix+da+Marinha,+Vila+Nova+de+Gaia,+Portugal" target="_blank" rel="noopener noreferrer">{T("Abrir mapa", "Open map")} ↗</a></div>
 </div></section>
 ''' + foot()
 
@@ -660,8 +678,8 @@ def faq():
              "Sim, as sessões podem ser em português ou em inglês. Ideal para quem está de visita ao Porto.",
              "Yes, sessions can be in Portuguese or English. Perfect for visitors to Porto."),
             ("Como reservo e qual a política de cancelamento?", "How do I book, and what’s the cancellation policy?",
-             "Reserve pelo formulário na página Serviços ou pelo WhatsApp. Confirmo a data por mensagem. Pode cancelar ou reagendar sem custos até 48 horas antes. Com menos antecedência, o sinal não é reembolsável, mas tentamos sempre encontrar outra data.",
-             "Book via the form on the Services page or on WhatsApp. I’ll confirm the date by message. You can cancel or reschedule free of charge up to 48 hours before. With less notice the deposit isn’t refundable, but we’ll always try to find another date."),
+             "Reserve pelo formulário na página Serviços ou pelo WhatsApp. Confirmo a data por mensagem. Pode cancelar ou reagendar sem custos até 48 horas antes. Com menos antecedência, tentamos encontrar outra data; as condições do sinal são comunicadas antes da reserva, sem prejuízo dos seus direitos legais. Consulte os <a href='termos.html'>termos e condições</a>.",
+             "Book via the form on the Services page or on WhatsApp. I’ll confirm the date by message. You can cancel or reschedule free of charge up to 48 hours before. With less notice, we try to find another date; deposit conditions are explained before booking, without affecting your legal rights. Read the <a href='termos.html'>terms and conditions</a>."),
         ]),
     ]
     body = ""
@@ -679,32 +697,47 @@ def faq():
            f'<a class="btn btn-line" href="contacto.html">{T("Página de contacto", "Contact page")}</a>') + foot()
 
 
-# ------------------------------------------------------------------ PRIVACY
-def privacy():
-    return head("privacidade.html", "Política de Privacidade | Marclaro", "Privacy Policy | Marclaro",
-                "Política de privacidade e cookies do site Claudia Sousa Art´s Marclaro.", "Privacy and cookie policy for the Claudia Sousa Art´s Marclaro website.") + \
-        page_hero("Legal", "Legal", "Política de privacidade", "Privacy policy",
-                  "Última atualização: setembro de 2026.", "Last updated: September 2026.") + f'''
+# ------------------------------------------------------------------ LEGAL
+# Shared legal layout; bilingual copy and publication flags live in legal_content.py.
+def legal_page(file):
+    content = LEGAL_PAGES[file]
+    pt, en = content["title"]
+    intro_pt, intro_en = content["intro"]
+    nav = '<nav class="legal-nav" aria-label="Informação legal / Legal information">' + "".join(
+        f'<a href="{url}"' + (' aria-current="page"' if url == file else '') + f'>{T(*data["title"])}</a>'
+        for url, data in LEGAL_PAGES.items()) + '</nav>'
+    note = T("Versão de preparação: antes da publicação comercial, é necessário confirmar a identificação fiscal, a morada profissional e de devolução, os preços e a informação de reclamações e resolução de litígios. Estas condições devem ser revistas pelo responsável do ateliê.",
+             "Pre-launch version: before commercial publication, tax identification, professional and return addresses, prices, and complaints and dispute resolution information must be confirmed. These terms should be reviewed by the studio owner.", "p", "legal-note") if content.get("draft") else ""
+    sections = "".join(T(hpt, hen, "h2") + T(bpt, ben, "p") for hpt, hen, bpt, ben in content["sections"])
+    extra = ""
+    if file == "cookies.html":
+        extra = f'''<h2>{T("Dados guardados neste navegador", "Data saved in this browser")}</h2>
+<dl class="storage-list">
+  <div><dt>mc-lang</dt><dd>{T("Preferência de idioma (PT ou EN), guardada quando escolhe o idioma. Funcional; permanece até ser apagada.", "Language preference (PT or EN), saved when you choose a language. Functional; kept until cleared.")}</dd></div>
+  <div><dt>mc-cart</dt><dd>{T("Peças e quantidades do carrinho, guardadas quando adiciona ou remove uma peça. Necessário ao carrinho solicitado; permanece até ser apagado. Não inclui nome, email, morada ou dados de pagamento.", "Cart pieces and quantities, saved when you add or remove an item. Necessary for the requested cart; kept until cleared. Does not include your name, email, address or payment details.")}</dd></div>
+</dl>
+<p>{T("Pode apagar o idioma e esvaziar o carrinho neste navegador com o botão abaixo. Também pode bloquear o armazenamento nas definições do navegador; nesse caso, as escolhas podem perder-se ao mudar de página.", "Use the button below to clear your saved language and empty the cart in this browser. You can also block storage in browser settings; choices may then be lost between pages.")}</p>
+<button class="btn btn-line" type="button" data-clear-storage style="margin-top:24px">{T("Apagar idioma e esvaziar carrinho", "Clear language and empty cart")}</button>
+<p data-storage-status role="status" aria-live="polite"></p>'''
+    elif file == "envios-devolucoes.html":
+        extra = f'''<div class="withdrawal">
+{T("Modelo de comunicação de livre resolução", "Withdrawal notification template", "h2")}
+{T('Para: Claudia Sousa Art´s Marclaro — <a href="mailto:claudimar60@gmail.com">claudimar60@gmail.com</a>.', 'To: Claudia Sousa Art´s Marclaro — <a href="mailto:claudimar60@gmail.com">claudimar60@gmail.com</a>.', "p")}
+{T("Comunico que resolvo o contrato de compra relativo à seguinte peça: [identificação]. Encomendada em: [data]. Recebida em: [data]. Nome do consumidor: [nome]. Endereço do consumidor: [endereço]. Data: [data]. Assinatura: [apenas se enviada em papel].", "I hereby withdraw from the purchase contract for the following item: [identification]. Ordered on: [date]. Received on: [date]. Consumer name: [name]. Consumer address: [address]. Date: [date]. Signature: [only for paper submissions].", "p")}
+</div>'''
+    return head(file, pt + " | Marclaro", en + " | Marclaro", intro_pt, intro_en) + \
+        page_hero("Informação legal", "Legal information", pt, en, intro_pt, intro_en) + f'''
 <section style="padding-top:10px"><div class="wrap prose">
-{T("Responsável", "Controller", "h2")}
-{T(f"Claudia Sousa (Claudia Sousa Art´s Marclaro), São Félix da Marinha, Vila Nova de Gaia. Contacto: {EMAIL}.", f"Claudia Sousa (Claudia Sousa Art´s Marclaro), São Félix da Marinha, Vila Nova de Gaia. Contact: {EMAIL}.", "p")}
-{T("Que dados recolhemos", "What data we collect", "h2")}
-{T("Apenas os dados que nos envia voluntariamente através dos formulários, do WhatsApp ou do email (nome, contacto, mensagem, morada de entrega quando aplicável).", "Only the data you voluntarily send via forms, WhatsApp or email (name, contact, message, delivery address where applicable).", "p")}
-{T("Para que usamos", "How we use it", "h2")}
-{T("Para responder aos seus pedidos, preparar orçamentos, processar encomendas e marcações. Nunca vendemos nem partilhamos os seus dados para fins comerciais. A base legal é o seu consentimento e a execução de um pedido que nos fez (RGPD, art.º 6.º).", "To reply to your requests, prepare quotes, and process orders and bookings. We never sell or share your data for marketing. The legal basis is your consent and fulfilling a request you made (GDPR, Art. 6).", "p")}
-{T("Cookies e estatísticas", "Cookies and analytics", "h2")}
-{T("O site guarda no seu navegador a preferência de idioma, o carrinho e a sua escolha de cookies. Só com a sua autorização carregamos o Plausible Analytics, uma ferramenta de estatísticas anónimas, sem cookies de rastreio e sem dados pessoais. O mapa é fornecido pelo Google Maps, sujeito à política do Google.", "The site stores your language preference, cart and cookie choice in your browser. Only with your permission do we load Plausible Analytics, an anonymous statistics tool with no tracking cookies and no personal data. The map is provided by Google Maps, subject to Google’s policy.", "p")}
-{T("Os seus direitos", "Your rights", "h2")}
-{T(f"Pode pedir acesso, retificação ou eliminação dos seus dados a qualquer momento através de {EMAIL}. Tem ainda o direito de apresentar reclamação à CNPD (cnpd.pt).", f"You may request access to, correction or deletion of your data at any time via {EMAIL}. You also have the right to complain to the Portuguese authority CNPD (cnpd.pt).", "p")}
-{T("Conservação", "Retention", "h2")}
-{T("Os dados são guardados apenas pelo tempo necessário para responder ao pedido e cumprir obrigações legais (ex.: faturação).", "Data is kept only as long as needed to handle your request and meet legal obligations (e.g. invoicing).", "p")}
-<p style="margin-top:30px"><a class="link" href="#" onclick="localStorage.removeItem('mc-consent');location.reload();return false">{T("Alterar preferências de cookies", "Change cookie preferences")}</a></p>
+{nav}{note}
+{T("Última atualização: 26 de setembro de 2026.", "Last updated: 26 September 2026.", "p", "muted")}
+{sections}{extra}
 </div></section>
 ''' + foot()
 
 
 PAGES = {"index.html": home, "sobre.html": about, "servicos.html": services, "portfolio.html": portfolio,
-         "loja.html": shop, "contacto.html": contact, "faq.html": faq, "privacidade.html": privacy}
+         "loja.html": shop, "contacto.html": contact, "faq.html": faq}
+PAGES.update({file: (lambda file=file: legal_page(file)) for file in LEGAL_PAGES})
 
 if __name__ == "__main__":
     import os
