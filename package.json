@@ -1,0 +1,11 @@
+{
+  "name": "marclaro-site-checks",
+  "private": true,
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  }
+}

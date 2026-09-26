@@ -1,7 +1,11 @@
-# artsmarclaro
+# Marclaro
 
-Static website for Claudia Sousa Art´s Marclaro — handmade ceramics and cold porcelain, Vila Nova de Gaia.
+Site estático bilingue de Claudia Sousa Art´s Marclaro — cerâmica e porcelana fria em Vila Nova de Gaia.
 
-- Edit text and pages in `build.py`, then run `python3 build.py` to regenerate the 8 HTML pages.
-- Styles live in `css/style.css`, behaviour in `js/main.js`, photos in `img/`.
-- See **GUIA.md** for the full maintenance guide (swapping photos, shop products, forms, hosting).
+- Conteúdo e modelos: `build.py`; políticas: `legal_content.py`.
+- Gerar as 11 páginas: `python3 build.py`.
+- Visual: `css/style.css`; interação: `js/main.js`; fotografias: `img/`.
+- Pré-visualizar: `python3 -m http.server 8000 --bind 0.0.0.0`.
+- Testes opcionais: `npm ci`, `npx playwright install --with-deps chromium` e `npm test`, com o servidor em execução.
+
+Ver **GUIA.md** para manutenção, testes e a lista de dados comerciais/legais que precisam de confirmação antes de publicar. As condições legais assinaladas como versão de preparação não devem ser tratadas como documentação final aprovada.
