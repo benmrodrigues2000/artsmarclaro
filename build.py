@@ -267,7 +267,7 @@ def home():
   <div class="facts-bar">
     <div><b>100%</b>{T("feito à mão", "handmade")}</div>
     <div><b>1/1</b>{T("não há duas iguais", "no two alike")}</div>
-    <div><b>24h</b>{T("envio após pagamento", "dispatch after payment")}</div>
+    <div><b>MB WAY</b>{T("pagamento simples", "easy payment")}</div>
   </div>
 </div></section>
 
@@ -313,7 +313,7 @@ def home():
     <div class="quad">
       <div>{ICON["hand"]}<div>{T("Feito à mão", "Handmade", "h3")}{T("Todas as peças são 100% feitas à mão, por isso cada uma é única.", "Every piece is 100% handmade, so each one is unique.", "p")}</div></div>
       <div>{ICON["box"]}<div>{T("Embalagem cuidada", "Careful packaging", "h3")}{T("Embalagens personalizadas para que cada peça chegue intacta.", "Custom packaging so every piece arrives intact.", "p")}</div></div>
-      <div>{ICON["star"]}<div>{T("Envio em 24h", "Ships in 24h", "h3")}{T("Peças prontas são enviadas até 24 horas após o pagamento.", "Ready-made pieces ship within 24 hours of payment.", "p")}</div></div>
+      <div>{ICON["star"]}<div>{T("Envio combinado", "Shipping, agreed with you", "h3")}{T("Peças prontas a enviar saem no dia que combinarmos, assim que o pagamento é confirmado.", "Ready-made pieces go out on the day we agree, once payment is confirmed.", "p")}</div></div>
       <div>{ICON["heart"]}<div>{T("Envio internacional", "International shipping", "h3")}{T("Enviamos para fora de Portugal, com portes sob orçamento.", "We ship outside Portugal, with shipping quoted on request.", "p")}</div></div>
     </div>
   </div>
@@ -564,13 +564,13 @@ def shop():
   <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
 </article>''' for i, s, pt, en, p, dpt, den in PRODUCTS)
     return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
-                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp, envio em 24 horas.",
-                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, dispatched within 24 hours.", "difusor.jpg") + \
+                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
+                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "difusor.jpg") + \
         page_hero("Loja", "Shop", "Peças prontas, <em>à sua espera.</em>", "Ready-made pieces, <em>waiting for you.</em>",
                   "Peças únicas feitas à mão e prontas a enviar. Quando se esgotam, não voltam iguais.",
                   "One-of-a-kind handmade pieces, ready to ship. Once they’re gone, they won’t come back the same.") + f'''
 <section style="padding-top:10px"><div class="wrap">
-  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e o envio. Envio em até 24h após pagamento. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability, payment (MB WAY or bank transfer) and shipping. Dispatched within 24h of payment. International shipping quoted on request.")}</p></div>
+  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade, o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces to your cart and click “Order via WhatsApp”. I’ll confirm availability and payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
   <div class="shop">{cards}</div>
   <p class="muted" style="margin-top:36px;text-align:center">{T("Procura algo diferente?", "Looking for something different?")} <a class="link" href="servicos.html#pecas">{T("Peça uma peça personalizada", "Commission a custom piece")} →</a></p>
 </div></section>
@@ -637,8 +637,8 @@ def faq():
              "Depende da peça. Peças em porcelana fria demoram normalmente 2 a 3 semanas. Cerâmica, que precisa de secar e ir ao forno, 3 a 5 semanas. Para eventos, fale comigo com a maior antecedência possível.",
              "It depends on the piece. Cold porcelain usually takes 2–3 weeks. Ceramics, which need to dry and be kiln-fired, take 3–5 weeks. For events, get in touch as early as you can."),
             ("Fazem entregas?", "Do you deliver?",
-             "Sim. Peças prontas são enviadas até 24 horas após o pagamento, em embalagem protetora personalizada. Também pode levantar no ateliê em São Félix da Marinha. Envio internacional com portes sob orçamento por email.",
-             "Yes. Ready-made pieces ship within 24 hours of payment, in custom protective packaging. You can also collect from the studio in São Félix da Marinha. International shipping is quoted by email."),
+             "Sim. Assim que o pagamento é confirmado, envio a peça em embalagem protetora personalizada, na data que combinarmos. Também pode levantar no ateliê em São Félix da Marinha. Envio internacional com portes sob orçamento por email.",
+             "Yes. Once payment is confirmed I send the piece in custom protective packaging, agreeing the day with you. You can also collect from the studio in São Félix da Marinha. International shipping is quoted by email."),
             ("Como posso pagar?", "How can I pay?",
              "MB WAY ou transferência bancária. Nas encomendas personalizadas é pedido um sinal para iniciar o trabalho.",
              "MB WAY or bank transfer. Custom commissions require a deposit to begin."),
