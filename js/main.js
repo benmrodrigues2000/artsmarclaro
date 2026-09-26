@@ -4,7 +4,7 @@
   const EMAIL = "claudimar60@gmail.com";
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
-  let lang = localStorage.getItem("mc-lang") || "pt";
+  let lang = localStorage.getItem("mc-lang") === "en" ? "en" : "pt";
   const t = (pt, en) => (lang === "en" ? en : pt);
 
   /* ---------- Language ---------- */
@@ -54,11 +54,11 @@
 
   /* ---------- Mobile nav ---------- */
   const burger = $(".burger"), nav = $(".nav");
-  if (burger) burger.addEventListener("click", () => {
-    const open = burger.getAttribute("aria-expanded") !== "true";
-    burger.setAttribute("aria-expanded", open);
-    nav.classList.toggle("open", open);
-  });
+  const setNav = (open) => { burger.setAttribute("aria-expanded", open); nav.classList.toggle("open", open); };
+  if (burger) {
+    burger.addEventListener("click", () => setNav(burger.getAttribute("aria-expanded") !== "true"));
+    nav.addEventListener("click", (e) => { if (e.target.closest("a")) setNav(false); });
+  }
 
   /* ---------- Reveal on scroll ---------- */
   const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => {
@@ -66,7 +66,7 @@
   }, { rootMargin: "0px 0px -8% 0px" }) : null;
   $$(".rv").forEach((el) => (io ? io.observe(el) : el.classList.add("in")));
 
-  /* ---------- Work rail (continuity) ---------- */
+  /* ---------- Home work rail ---------- */
   const rail = $(".rail");
   if (rail) {
     const bar = $(".rail-line span");
@@ -123,7 +123,9 @@
   }
 
   /* ---------- Shop / cart ---------- */
-  let cart = JSON.parse(localStorage.getItem("mc-cart") || "[]");
+  let cart = [];
+  try { cart = JSON.parse(localStorage.getItem("mc-cart") || "[]"); if (!Array.isArray(cart)) cart = []; }
+  catch { cart = []; }
   const eur = (n) => n.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
   const save = () => localStorage.setItem("mc-cart", JSON.stringify(cart));
   function renderCart() {
@@ -185,7 +187,6 @@
       });
       if (!ok) { const first = $(".invalid input, .invalid select, .invalid textarea", f); if (first) first.focus(); return; }
 
-      const data = Object.fromEntries(new FormData(f).entries());
       const endpoint = f.dataset.endpoint; // e.g. https://formspree.io/f/xxxx — see GUIA.md
       const okBox = $(".ok", f);
       if (endpoint) {
@@ -195,7 +196,16 @@
         } catch { alert(t("Não foi possível enviar. Por favor tente pelo WhatsApp.", "Could not send. Please try WhatsApp.")); return; }
       } else {
         // No backend yet: open WhatsApp with the full request (the fastest reply channel)
-        const body = Object.entries(data).filter(([k]) => k !== "rgpd").map(([k, v]) => `${k}: ${v}`).join("\n");
+        const body = [...f.elements]
+          .filter((el) => el.name && el.name !== "rgpd" && el.type !== "checkbox")
+          .map((el) => {
+            const lab = el.id && f.querySelector(`label[for="${el.id}"]`);
+            const name = lab ? lab.textContent.replace("*", "").trim() : el.name;
+            let val = el.tagName === "SELECT" ? el.selectedOptions[0].textContent.trim() : el.value.trim();
+            if (el.type === "date" && el.value) val = new Date(el.value + "T00:00").toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT");
+            return val ? `${name}: ${val}` : null;
+          })
+          .filter(Boolean).join("\n");
         const head = f.dataset.kind === "booking" ? t("Pedido de marcação", "Booking request") : t("Mensagem do site", "Website message");
         window.open(waLink(`${head}\n\n${body}`), "_blank", "noopener");
       }
@@ -215,7 +225,7 @@
     const em = $("input", n).value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { $("input", n).focus(); return; }
     location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Newsletter")}&body=${encodeURIComponent(t("Quero receber novidades: ", "Please add me: ") + em)}`;
-    $("input", n).value = ""; $("input", n).placeholder = t("Obrigada! ✦", "Thank you! ✦");
+    $("input", n).value = ""; $("input", n).placeholder = t("Obrigada!", "Thank you!");
   }));
 
   /* ---------- Cookie notice (GDPR) + analytics only after consent ---------- */
