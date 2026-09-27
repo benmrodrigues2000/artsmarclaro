@@ -536,6 +536,13 @@ PORT = [
     ("escultura.jpg", "ceramica", "Escultura em cerâmica, pormenor", "Ceramic sculpture, detail"),
     ("aula-logotipo.jpg", "aulas personalizadas", "Personalizar uma caneca", "Personalising a mug"),
     ("forno.jpg", "ceramica", "Peças prontas para cozer", "Pieces ready for firing"),
+    ("canecas-palavras.jpg", "ceramica personalizadas", "Canecas com palavras: amor, paz, amizade", "Word mugs: love, peace, friendship"),
+    ("canecas-palavras-secagem.jpg", "ceramica personalizadas", "Canecas com palavras a secar no ateliê", "Word-stamped mugs drying at the studio"),
+    ("taca-textura.jpg", "ceramica", "Taça branca com faixa texturada", "White bowl with textured band"),
+    ("taca-textura-sol.jpg", "ceramica", "Taça texturada em luz natural", "Textured bowl in natural light"),
+    ("taca-ondulada.jpg", "ceramica", "Taça de bordo ondulado", "Wavy-rimmed bowl"),
+    ("atelier-ferramentas.jpg", "aulas", "Bancada do ateliê com ferramentas de modelação", "Studio bench with modelling tools"),
+    ("atelier-vista.jpg", "aulas", "Vista do ateliê em São Félix da Marinha", "View of the studio in São Félix da Marinha"),
 ]
 
 
