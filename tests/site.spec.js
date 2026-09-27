@@ -53,16 +53,28 @@ test('portfolio journey, filters and keyboard lightbox', async ({ page }) => {
 
 test('catalogue, cart persistence, quote hand-off and storage deletion', async ({ page }) => {
   await page.goto('/loja.html');
-  await expect(page.locator('.prod')).toHaveCount(6);
-  await page.locator('.prod').first().locator('.qty input').fill('2');
-  await page.locator('.prod').first().locator('.add').click();
+  // The catalogue in build.py is the source of truth: count the cards it emitted and read the first price.
+  const productCount = (fs.readFileSync('loja.html', 'utf8').match(/<article class="prod /g) || []).length;
+  expect(productCount).toBeGreaterThan(0);
+  await expect(page.locator('.prod')).toHaveCount(productCount);
+  const first = page.locator('.prod').first();
+  const firstName = (await first.locator('h3').textContent()).trim();
+  const unit = await first.getAttribute('data-price'); // "" means "Sob consulta / Price on request"
+  const money = (n) => n.toFixed(2).replace('.', ',');
+  const lineText = unit === '' ? 'sob consulta' : money(+unit);
+  const totalText = unit === '' ? 'A combinar' : money(2 * +unit);
+  await first.locator('.qty input').fill('2');
+  await first.locator('.add').click();
   await expect(page.locator('#cart')).toHaveAttribute('aria-hidden', 'false');
-  await expect(page.locator('#cart .total b')).toHaveText(/76,00/);
+  await expect(page.locator('.ci small')).toContainText(`2 × ${lineText}`); // never "0,00 €" for on-request pieces
+  await expect(page.locator('#cart .total b')).toContainText(totalText);
   await expect(page.locator('#cart a[href="termos.html"]')).toBeVisible();
   await page.evaluate(() => { window.open = url => { window.testOutgoing = url; }; });
+  // "Finalizar pedido" asks for the customer's details first; WhatsApp only opens once they are valid.
   await page.locator('.checkout').click();
   const checkout = page.locator('#checkout-form');
   await expect(checkout).toBeVisible();
+  await expect(page.locator('.checkout')).toBeHidden();
   await expect(checkout.locator('[name="name"]')).toBeFocused();
   expect(await page.evaluate(() => window.testOutgoing)).toBeUndefined();
   await checkout.locator('[type="submit"]').click();
@@ -78,7 +90,8 @@ test('catalogue, cart persistence, quote hand-off and storage deletion', async (
   await checkout.locator('[name="notes"]').fill('Embrulho para presente & cartão');
   await checkout.locator('[type="submit"]').click();
   const outgoing = await page.evaluate(() => new URL(window.testOutgoing).searchParams.get('text'));
-  for (const detail of ['2 × Difusor', '76,00', 'Ana Sousa', 'ana@example.com', '+351 919 123 456', 'Rua das Flores 12', 'Embrulho para presente & cartão']) {
+  for (const detail of [`2 × ${firstName} (${lineText}`, `Total: ${totalText}`, 'Portes a confirmar', 'Nome: Ana Sousa', 'Email: ana@example.com',
+    'Telefone: +351 919 123 456', 'Entrega: Envio para a morada', 'Morada: Rua das Flores 12', 'Observações: Embrulho para presente & cartão']) {
     expect(outgoing).toContain(detail);
   }
   await expect(checkout.locator('[data-checkout-status]')).toBeVisible();
