@@ -13,6 +13,7 @@ The shop mirrors the **WhatsApp Business catalog** (https://wa.me/c/149207197470
 - Use `None` as the price to show “Sob consulta / Price on request” (the cart total then shows “A combinar / To be agreed”). **Set your real prices when you have them.**
 - `img/brinco-1…5.jpg` and `img/presepio-3.jpg` are generated placeholders (see `img/_make_placeholders.py`) — replace them with the real photos, same names, when you have them.
 - After editing, run `python3 build.py`. The cart sends the order through WhatsApp; you confirm payment by MB WAY or bank transfer.
+- **Checkout details:** “Finalizar pedido / Checkout” does not open WhatsApp straight away — it first asks the customer for their details (full name, email, phone, delivery method, the address when shipping, optional notes and a privacy acknowledgement). Only when the form is valid is the WhatsApp message composed, with the items, the total (“A combinar / To be agreed” while any piece is on request) and those details. Nothing is stored in the browser or sent anywhere else. The fields live in the `cart_drawer()` helper in `build.py`.
 The cart panel (the `cart_drawer()` helper in `build.py`) is part of the shared footer, so it exists on **every**
 page and the basket icon in the header just opens it wherever the visitor is — only the product grid lives on
 `loja.html`. The basket itself is kept in the visitor's browser (localStorage), so the items are still there when

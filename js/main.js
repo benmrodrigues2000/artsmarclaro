@@ -153,13 +153,20 @@
   let cart = [];
   try { cart = JSON.parse(storage.get("mc-cart") || "[]"); if (!Array.isArray(cart)) cart = []; }
   catch { cart = []; }
+  // `p` is the unit price in EUR, or null for "Sob consulta / Price on request" items.
   cart = cart.filter((i) => i && typeof i.id === "string" && typeof i.pt === "string" &&
     typeof i.en === "string" && typeof i.img === "string" && /^img\/[a-z0-9-]+\.jpg$/.test(i.img) &&
-    Number.isFinite(i.p) && i.p >= 0 && Number.isInteger(i.q) && i.q > 0 && i.q <= 20);
+    (i.p === null || (Number.isFinite(i.p) && i.p >= 0)) && Number.isInteger(i.q) && i.q > 0 && i.q <= 20);
   const html = (value) => String(value).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[c]));
   const eur = (n) => n.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
+  const price = (i) => (i.p == null ? t("sob consulta", "price on request") : eur(i.p));
+  // Any item still "on request" makes the total open until Claudia confirms it.
+  const cartTotal = () => (cart.some((i) => i.p == null)
+    ? t("A combinar", "To be agreed")
+    : eur(cart.reduce((s, i) => s + i.q * i.p, 0)));
+  const orderLines = () => cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${price(i)})`).join("\n");
   const save = () => storage.set("mc-cart", JSON.stringify(cart));
   const drawer = $("#cart"), veil = $(".veil");
   const checkoutForm = $("#checkout-form");
@@ -200,11 +207,10 @@
       }
       box.innerHTML = `<p class="empty">${t("O seu carrinho está vazio.", "Your cart is empty.")}<small>${t("Espreite o catálogo e junte as suas peças favoritas.", "Have a look at the catalogue and add your favourite pieces.")}</small></p>`;
     } else {
-      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${lang === "en" ? i.en : i.pt}</b><small>${i.q} × ${i.p == null ? t("sob consulta", "price on request") : eur(i.p)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
+      box.innerHTML = cart.map((i, k) => `<div class="ci"><img src="${i.img}" alt=""><div><b>${html(lang === "en" ? i.en : i.pt)}</b><small>${i.q} × ${price(i)}</small></div><button type="button" data-rm="${k}">${t("remover", "remove")}</button></div>`).join("");
     }
     const tot = $(".drawer .total b"), co = $(".drawer .checkout");
-    const priced = cart.filter((i) => i.p != null);
-    if (tot) tot.textContent = cart.length && priced.length < cart.length ? t("A combinar", "To be agreed") : eur(priced.reduce((s, i) => s + i.q * i.p, 0));
+    if (tot) tot.textContent = cartTotal();
     if (co) { co.toggleAttribute("disabled", !cart.length); co.style.opacity = cart.length ? 1 : .5; }
   }
 
@@ -247,14 +253,11 @@
       const rm = e.target.closest("[data-rm]");
       if (rm) { cart.splice(+rm.dataset.rm, 1); save(); renderCart(); }
     });
+    // "Finalizar pedido" opens the order-details step. WhatsApp is only opened once the
+    // customer has filled in their details and the form below validates.
     const co = $(".drawer .checkout");
     if (co) co.onclick = () => {
-      if (!cart.length) return;
-      const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${i.p == null ? t("sob consulta", "price on request") : eur(i.p)})`).join("\n");
-      const tot = cart.some((i) => i.p == null) ? t("A combinar", "To be agreed") : eur(cart.reduce((s, i) => s + i.q * i.p, 0));
-      const msg = t(`Olá Claudia! Gostava de encomendar:\n${lines}\nTotal: ${tot}\n\nNome:\nMorada de entrega (ou levantamento no ateliê):`,
-                    `Hi Claudia! I'd like to order:\n${lines}\nTotal: ${tot}\n\nName:\nDelivery address (or pick-up at the studio):`);
-      window.open(waLink(msg), "_blank", "noopener");
+      if (cart.length && checkoutForm) checkoutStep(true, true);
     };
     if (checkoutForm) {
       $("[data-checkout-back]", checkoutForm).onclick = () => checkoutStep(false, true);
@@ -283,8 +286,6 @@
         if (!checkoutForm.reportValidity()) return;
         const values = new FormData(checkoutForm);
         const value = (key) => String(values.get(key) || "").trim();
-        const lines = cart.map((i) => `• ${i.q} × ${lang === "en" ? i.en : i.pt} (${eur(i.p)})`).join("\n");
-        const tot = eur(cart.reduce((s, i) => s + i.q * i.p, 0));
         const details = [
           `${t("Nome", "Name")}: ${value("name")}`,
           `Email: ${value("email")}`,
@@ -293,7 +294,7 @@
           delivery.value === "shipping" ? `${t("Morada", "Address")}: ${value("address")}` : "",
           value("notes") ? `${t("Observações", "Notes")}: ${value("notes")}` : ""
         ].filter(Boolean).join("\n");
-        const msg = `${t("Olá Claudia! Gostava de encomendar:", "Hi Claudia! I'd like to order:")}\n${lines}\nTotal: ${tot}\n${t("Portes a confirmar.", "Shipping to be confirmed.")}\n\n${details}`;
+        const msg = `${t("Olá Claudia! Gostava de encomendar:", "Hi Claudia! I'd like to order:")}\n${orderLines()}\nTotal: ${cartTotal()}\n${t("Portes a confirmar.", "Shipping to be confirmed.")}\n\n${details}`;
         const url = waLink(msg);
         $("[data-checkout-link]", checkoutForm).href = url;
         $("[data-checkout-status]", checkoutForm).hidden = false;
@@ -308,7 +309,8 @@
     $(".add", p).onclick = () => {
       const d = p.dataset, q = Math.max(1, Math.min(20, Math.floor(+inp.value || 1)));
       const ex = cart.find((i) => i.id === d.id);
-      ex ? (ex.q = Math.min(20, ex.q + q)) : cart.push({ id: d.id, pt: d.npt, en: d.nen, p: +d.price, img: $("img", p).getAttribute("src"), q });
+      const unit = d.price === "" || !Number.isFinite(+d.price) ? null : +d.price; // empty data-price = "Sob consulta"
+      ex ? (ex.q = Math.min(20, ex.q + q)) : cart.push({ id: d.id, pt: d.npt, en: d.nen, p: unit, img: $("img", p).getAttribute("src"), q });
       save(); renderCart(true); inp.value = 1; openCart(true);
     };
   });

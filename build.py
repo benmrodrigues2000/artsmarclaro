@@ -662,15 +662,16 @@ def shop():
   <button class="btn btn-solid add" type="button">{T("Adicionar", "Add to cart")}</button></div></div>
 </article>''' for i, s, pt, en, p, dpt, den in items)
         blocks.append(f'<h3 class="shop-cat rv">{T(cpt, cen)}</h3>{cards}')
-    return head("loja.html", "Loja — Peças de cerâmica feitas à mão | Marclaro", "Shop — Handmade ceramic pieces | Marclaro",
-                "Compre peças de cerâmica feitas à mão, prontas a enviar. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
-                "Buy handmade ceramic pieces ready to ship. Simple ordering via WhatsApp, with delivery or studio pick-up.", "caneca-carolina.jpg") + \
-        page_hero("Loja", "Shop", "Peças prontas, <em>à sua espera.</em>", "Ready-made pieces, <em>waiting for you.</em>",
-                  "Peças únicas feitas à mão e prontas a enviar. Quando se esgotam, não voltam iguais.",
-                  "One-of-a-kind handmade pieces, ready to ship. Once they’re gone, they won’t come back the same.") + f'''
+    return head("loja.html", "Catálogo — Peças de cerâmica feitas à mão | Marclaro", "Catalogue — Handmade ceramic pieces | Marclaro",
+                "Descubra peças de cerâmica feitas à mão. Encomenda simples por WhatsApp e envio ou levantamento no ateliê.",
+                "Discover handmade ceramic pieces. Simple ordering via WhatsApp, with delivery or studio pick-up.", "caneca-carolina.jpg") + \
+        page_hero("Catálogo", "Catalogue", "Objetos feitos <em>com tempo.</em>", "Objects made <em>with time.</em>",
+                  "Cerâmica feita à mão, peça a peça. Escolha as suas favoritas e confirme a disponibilidade comigo.",
+                  "Handmade ceramics, piece by piece. Choose your favourites and check availability with me.") + f'''
 <section style="padding-top:10px"><div class="wrap">
-  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ou serviços ao carrinho e clique em “Encomendar por WhatsApp”. Confirmo a disponibilidade e o preço (quando sob consulta), o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces or services to your cart and click “Order via WhatsApp”. I’ll confirm availability and the price (when on request), payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
+  <div class="notice">{ICON["info"]}<p>{T("<b>Como comprar:</b> adicione as peças ou serviços ao carrinho, clique em “Finalizar pedido” e preencha os seus dados (nome, contacto e entrega). O pedido segue por WhatsApp: confirmo a disponibilidade e o preço (quando sob consulta), o pagamento (MB WAY ou transferência) e combino consigo o dia do envio. Envio internacional sob orçamento.", "<b>How to buy:</b> add pieces or services to your cart, click “Checkout” and fill in your details (name, contact and delivery). Your request goes out via WhatsApp: I’ll confirm availability and the price (when on request), payment (MB WAY or bank transfer), then we agree the day it goes out. International shipping quoted on request.")}</p></div>
   <div class="shop">{"".join(blocks)}</div>
+  <details class="buying-info"><summary>{T("Como encomendar, pagamentos e entregas", "Ordering, payment and delivery")}</summary><div>{T('Adicione as peças ao carrinho e envie o pedido por WhatsApp. Antes de qualquer pagamento, confirmo a disponibilidade, o valor total com portes e o prazo. Pagamento por MB WAY ou transferência bancária. Pode combinar o levantamento no ateliê. Consulte os <a href="termos.html">termos e condições</a> e a política de <a href="envios-devolucoes.html">envios e devoluções</a>.', 'Add your pieces to the cart and send a request via WhatsApp. Before any payment, I confirm availability, the total including shipping and the timeline. Pay by MB WAY or bank transfer, or arrange studio collection. Read our <a href="termos.html">terms and conditions</a> and <a href="envios-devolucoes.html">shipping and returns policy</a>.', "p")}</div></details>
   <p class="muted" style="margin-top:36px;text-align:center">{T("Procura algo diferente?", "Looking for something different?")} <a class="link" href="servicos.html#pecas">{T("Peça uma peça personalizada", "Commission a custom piece")} →</a></p>
 </div></section>
 ''' + foot(on_shop=True)
