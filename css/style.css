@@ -246,8 +246,11 @@ section:not(.ground) .sign{color:var(--coffee)}
 
 /* ---------- SHOP ---------- */
 .shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
-.prod{background:var(--white);border-radius:0;overflow:hidden;display:flex;flex-direction:column;padding:12px}
-.prod .img{aspect-ratio:1;overflow:hidden;border-radius:0}
+.shop-cat{grid-column:1/-1;font-size:clamp(1.6rem,2.6vw,2.1rem);margin-top:var(--grp)}
+.shop-cat:first-child{margin-top:0}
+.prod .price.nc{font-size:1.12rem}
+.prod{background:var(--white);border-radius:calc(var(--r) + 4px);overflow:hidden;display:flex;flex-direction:column;padding:12px}
+.prod .img{aspect-ratio:1;overflow:hidden;border-radius:999px 999px 18px 18px}
 .prod .img img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
 .prod:hover .img img{transform:scale(1.05)}
 .prod .body{padding:18px 10px 8px;display:flex;flex-direction:column;gap:4px;flex:1;text-align:center;align-items:center}
